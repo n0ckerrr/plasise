@@ -18,5 +18,7 @@ __pycache__/
 
 # Otros
 n0cker-push/  # Asumiendo que es un repo o servicio aparte
+node_modules/
 Demo.pdf
 processed_orders.json
+
