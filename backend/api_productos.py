@@ -1,4 +1,6 @@
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, session, Response
+from invoice_generator import generate_invoice_pdf
+
 from flask_cors import CORS
 import mysql.connector
 import os
@@ -993,6 +995,52 @@ def get_user_order_detail(id):
         cursor.close()
         conn.close()
         return jsonify({'success': True, 'order': order})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/v1/user/orders/<int:id>/invoice', methods=['GET'])
+def get_order_invoice(id):
+    if not session.get('user_id'):
+        return jsonify({'success': False, 'error': 'No autenticado'}), 401
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+        
+        # 1. Obtener pedido (validando propiedad)
+        cursor.execute("""
+            SELECT p.*, u.nombre as cliente_nombre, u.email as cliente_email
+            FROM pedidos p
+            JOIN usuarios u ON p.usuario_id = u.id
+            WHERE p.id = %s AND p.usuario_id = %s
+        """, (id, session['user_id']))
+        order = cursor.fetchone()
+        
+        if not order:
+            return jsonify({'success': False, 'error': 'Pedido no encontrado'}), 404
+            
+        # 2. Obtener items
+        cursor.execute("SELECT * FROM pedido_items WHERE pedido_id = %s", (id,))
+        order['items'] = cursor.fetchall()
+        
+        # 3. Formatear fecha
+        if order.get('fecha'):
+            order['fecha_pedido'] = order['fecha'].strftime("%d/%m/%Y")
+        
+        cursor.close()
+        conn.close()
+        
+        # 4. Generar PDF
+        pdf_bytes = generate_invoice_pdf(order)
+        
+        return Response(
+            pdf_bytes,
+            mimetype='application/pdf',
+            headers={
+                "Content-disposition": f"attachment; filename=Factura_Plasise_{id}.pdf"
+            }
+        )
+        
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 

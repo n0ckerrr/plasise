@@ -660,12 +660,14 @@
         </div>
 
         <div class="actions">
+          <button onclick="downloadInvoice()" class="btn-premium"><i class="fas fa-file-pdf"></i> Descargar Factura</button>
           <button onclick="window.print()" class="btn-outline"><i class="fas fa-print"></i> Imprimir Recibo</button>
-          <a href="contacto.html" class="btn-premium"><i class="fas fa-headset"></i> Soporte Post-Venta</a>
+          <a href="contacto.html" class="btn-outline" style="background: #fff; color: #1a1a1a;"><i class="fas fa-headset"></i> Soporte Post-Venta</a>
         </div>
       </div>
     </div>
   </main>
+
 
   <footer class="bg-dark text-white py-4 mt-5">
     <div class="container text-center">
@@ -803,9 +805,9 @@
 
         // Actions
         const actionsContainer = document.querySelector('.actions');
-        let actionsHtml = `<button onclick="window.print()" class="btn-outline"><i class="fas fa-print"></i> Imprimir Recibo</button>
-                           <a href="contacto.html" class="btn-premium"><i class="fas fa-headset"></i> Soporte Post-Venta</a>
-                           <button class="btn-outline" onclick="window.location.href='productos.html'"><i class="fas fa-redo"></i> Volver a Pedir</button>`;
+        let actionsHtml = `<button onclick="downloadInvoice(${o.id})" class="btn-premium"><i class="fas fa-file-pdf"></i> Descargar Factura</button>
+                           <button onclick="window.print()" class="btn-outline"><i class="fas fa-print"></i> Imprimir Recibo</button>
+                           <a href="contacto.html" class="btn-outline" style="background: #fff; color: #1a1a1a;"><i class="fas fa-headset"></i> Soporte Post-Venta</a>`;
 
         if (o.estado === 'pendiente' || o.estado === 'carrito') {
           actionsHtml += `<button onclick="cancelarPedido(${o.id})" class="btn-outline" style="border-color: #dc3545; color: #dc3545; background-color: #fff5f5;"><i class="fas fa-times-circle"></i> Cancelar Pedido</button>`;
@@ -818,6 +820,34 @@
       } catch (e) {
         console.error(e);
         document.getElementById('loader').innerHTML = '<div class="alert alert-danger">No se pudo cargar la información del pedido.</div>';
+      }
+    }
+
+    async function downloadInvoice(id) {
+      try {
+        const btn = event.currentTarget;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+        btn.disabled = true;
+
+        const response = await fetch(`${API}/user/orders/${id}/invoice`, { credentials: 'include' });
+        
+        if (!response.ok) throw new Error('Error al generar factura');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Factura_Plasise_${id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+      } catch (e) {
+        alert('No se pudo descargar la factura. Por favor, contacte con soporte.');
+        console.error(e);
       }
     }
 
