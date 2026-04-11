@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Direcciones - PLASISE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a0a0f;
+            --primary-light: #16161d;
+            --accent: #c8a45e;
+            --accent-light: #d4b76a;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --text-light: #999;
+            --bg: #fff;
+            --bg-alt: #fafafa;
+            --border: #e8e8e8;
+            --success: #2d8a5f;
+            --warning: #b38600;
+            --danger: #b32d2d;
+        }
+
+        .logout-link { color: var(--danger) !important; }
+
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--bg-alt);
+        }
+
+        /* Header (Premium) */
+        .site-header {
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .logo:hover {
+            color: var(--accent);
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .main-nav a:hover,
+        .main-nav a.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .cart-btn {
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            align-items: center;
+        }
+
+        .cart-btn.show {
+            display: flex;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-dropdown {
+            position: relative;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 240px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .user-dropdown.open .user-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            padding: 20px;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-menu-header strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 2px;
+            color: var(--primary);
+        }
+
+        .user-menu-header small {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .user-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .user-menu a:hover {
+            background: var(--bg-alt);
+            color: var(--primary);
+        }
+
+        .user-menu i {
+            width: 16px;
+            color: var(--text-muted);
+        }
+
+        .user-menu a.logout {
+            color: var(--danger);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--primary);
+            padding: 100px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Layout */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .account-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 60px;
+        }
+
+        /* Sidebar */
+        .account-sidebar {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 48px 32px;
+            height: fit-content;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
+        }
+
+        .account-user {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .account-avatar {
+            width: 110px;
+            height: 110px;
+            background: var(--bg-alt);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 44px;
+            color: var(--accent);
+            border: 2px solid var(--border);
+        }
+
+        .account-user h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .account-user p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .account-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .account-nav li {
+            margin-bottom: 8px;
+        }
+
+        .account-nav a {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 15px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .account-nav a:hover {
+            background: var(--bg-alt);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .account-nav a.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .account-nav a.active i {
+            color: var(--accent);
+        }
+
+        /* Content */
+        .content-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
+            margin-bottom: 40px;
+        }
+
+        .content-card-header {
+            padding: 32px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-card-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .content-card-body {
+            padding: 40px;
+        }
+
+        /* Address Cards */
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .address-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .address-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .address-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .address-card h4 i {
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .address-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .address-badge {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: var(--bg-alt);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .btn-premium {
+            padding: 12px 28px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-premium:hover {
+            background: var(--accent);
+            color: var(--primary);
+            box-shadow: 0 8px 20px rgba(200, 164, 94, 0.3);
+        }
+
+        .btn-outline {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-alt);
+            border-color: var(--text-muted);
+        }
+
+        /* Form Controls */
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            background: var(--bg-alt);
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(200, 164, 94, 0.1);
+            background: #fff;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: rgba(255, 255, 255, 0.6);
+            padding: 100px 0 40px;
+            margin-top: 120px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 80px;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+
+        footer h5 {
+            color: #fff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer li {
+            margin-bottom: 12px;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        @media (max-width: 992px) {
+            .account-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+<script src="../assets/js/config.js"></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">PLASISE</a>
+            <nav class="main-nav">
+                <a href="index.html">Inicio</a>
+                <a href="productos.html">Productos</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+            <div class="header-actions">
+                <a href="carrito.html" class="cart-btn" id="cartBtn">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName">Mi Cuenta</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-menu-header">
+                            <strong id="userFullName">-</strong>
+                            <small id="userEmail">-</small>
+                        </div>
+                        <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
+                        <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
+                        <a href="direcciones.html" class="active"><i class="fas fa-map-marker-alt"></i> Direcciones</a>
+                        <div class="user-menu-divider"></div>
+                        <a href="#" class="logout" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <h1>Mis Direcciones</h1>
+        <p>Gestiona tus ubicaciones de envío para una logística profesional y eficiente</p>
+    </section>
+
+    <main class="main-content">
+        <div class="account-layout">
+            <aside class="account-sidebar">
+                <div class="account-user">
+                    <div class="account-avatar"><i class="fas fa-user"></i></div>
+                    <h3 id="sidebarName">-</h3>
+                    <p id="sidebarEmail">-</p>
+                </div>
+                <ul class="account-nav">
+                    <li><a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a></li>
+                    <li><a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a></li>
+                    <li><a href="direcciones.html" class="active"><i class="fas fa-map-marker-alt"></i> Direcciones</a>
+                    </li>
+                    <li><a href="#" class="logout logout-link" onclick="logout(); return false;"><i
+                                class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                </ul>
+            </aside>
+
+            <div class="content-area">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h2>Direcciones Guardadas</h2>
+                        <button class="btn-premium" onclick="showAddForm()"><i class="fas fa-plus"></i> Añadir
+                            Nueva</button>
+                    </div>
+                    <div class="content-card-body">
+                        <div id="addressList" class="address-grid">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card d-none" id="addAddressCard">
+                    <div class="content-card-header">
+                        <h2>Nueva Dirección de Envío</h2>
+                    </div>
+                    <div class="content-card-body">
+                        <form id="addressForm" onsubmit="saveAddress(event)">
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label">Nombre de la Ubicación (ej: Oficina Central,
+                                        Almacén)</label>
+                                    <input type="text" class="form-control" name="alias" required
+                                        placeholder="Ej: Sede Principal">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Dirección Completa</label>
+                                    <input type="text" class="form-control" name="direccion" required
+                                        placeholder="Calle, número, piso...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Población / Ciudad</label>
+                                    <input type="text" class="form-control" name="ciudad" required placeholder="Ej: Girona">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Código Postal</label>
+                                    <input type="text" class="form-control" name="codigo_postal" required placeholder="Ej: 17001">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Provincia</label>
+                                    <input type="text" class="form-control" name="provincia" required placeholder="Ej: Girona">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">País</label>
+                                    <input type="text" class="form-control" name="pais" value="España" title="País" placeholder="País" disabled>
+                                </div>
+                            </div>
+                            <div class="mt-5 d-flex gap-3">
+                                <button type="submit" class="btn-premium">Guardar Dirección</button>
+                                <button type="button" class="btn-outline" onclick="hideAddForm()">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-2">&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+            <div class="legal-links small">
+                <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a> | 
+                <a href="legales/politica-privacidad.html" class="text-white-50 text-decoration-none mx-2">Privacidad</a> | 
+                <a href="legales/politica-cookies.html" class="text-white-50 text-decoration-none mx-2">Cookies</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API = '/api/v1';
+
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('open');
+        }
+
+        async function checkAuth() {
+            try {
+                const r = await fetch(API + '/auth/session', { credentials: 'include' });
+                const d = await r.json();
+                if (!d.authenticated) { window.location.href = 'login.html'; return; }
+
+                document.getElementById('userDropdown').classList.add('show');
+                document.getElementById('userName').textContent = d.user.nombre;
+                document.getElementById('userFullName').textContent = d.user.nombre + ' ' + (d.user.apellidos || '');
+                document.getElementById('userEmail').textContent = d.user.email;
+                document.getElementById('sidebarName').textContent = d.user.nombre + ' ' + (d.user.apellidos || '');
+                document.getElementById('sidebarEmail').textContent = d.user.email;
+
+                loadAddresses();
+                loadCart();
+            } catch (e) { window.location.href = 'login.html'; }
+        }
+
+        async function loadCart() {
+            try {
+                const r = await fetch(API + '/cart', { credentials: 'include' });
+                const d = await r.json();
+                document.getElementById('cartCount').textContent = d.items_count || 0;
+            } catch (e) { }
+        }
+
+        async function loadAddresses() {
+            const container = document.getElementById('addressList');
+            try {
+                // Assuming an endpoint exists or returning placeholder
+                const r = await fetch(API + '/user/addresses', { credentials: 'include' });
+                const d = await r.json();
+
+                if (!d.addresses || d.addresses.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No tienes direcciones guardadas.</p>';
+                } else {
+                    container.innerHTML = d.addresses.map(addr => `
+                        <div class="address-card">
+                            <span class="address-badge">${addr.principal ? 'Principal' : 'Secundaria'}</span>
+                            <h4><i class="fas fa-building"></i> ${addr.alias}</h4>
+                            <p>${addr.direccion}</p>
+                            <p>${addr.codigo_postal} ${addr.ciudad}</p>
+                            <p>${addr.provincia}, ${addr.pais}</p>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-sm text-primary p-0" style="font-size: 11px; font-weight:700;">EDITAR</button>
+                                <button class="btn btn-sm text-danger p-0" style="font-size: 11px; font-weight:700;">ELIMINAR</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                container.innerHTML = '<p class="text-muted">No se pudieron cargar las direcciones.</p>';
+            }
+        }
+
+        function showAddForm() { document.getElementById('addAddressCard').style.display = 'block'; }
+        function hideAddForm() { document.getElementById('addAddressCard').style.display = 'none'; }
+
+        async function logout() {
+            await fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' });
+            window.location.href = 'index.html';
+        }
+
+        checkAuth();
+    </script>
+        <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+
+</html>

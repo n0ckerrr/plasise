@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notificaciones Push - PLASISE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-bg: #0a0a0f;
+      --sidebar-hover: #16161d;
+      --accent: #c8a45e;
+      --text-light: #a0a0a0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafafa; min-height: 100vh; overflow: hidden; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 260px;
+      background: var(--sidebar-bg); color: #fff; z-index: 100;
+      transition: transform 0.3s;
+    }
+    .sidebar-brand {
+      padding: 20px; font-size: 24px; font-family: 'Playfair Display', serif; font-weight: 700;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-brand span { color: var(--accent); }
+    .sidebar-nav { padding: 20px 0; }
+    .nav-section { padding: 10px 20px; font-size: 11px; text-transform: uppercase; color: var(--text-light); letter-spacing: 1px; }
+    .nav-item {
+      display: flex; align-items: center; padding: 12px 20px; color: #fff;
+      text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: var(--accent); }
+    .nav-item.active { background: var(--sidebar-hover); border-left-color: var(--accent); color: var(--accent); }
+    .nav-item i { width: 24px; margin-right: 12px; }
+    
+    /* Main */
+    .main { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Top Bar */
+    .topbar {
+      background: #fff; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 50;
+    }
+    .topbar-title { font-size: 20px; font-family: 'Playfair Display', serif; font-weight: 600; }
+    .topbar-user { display: flex; align-items: center; gap: 10px; }
+    
+    /* Content - Iframe Container */
+    .content-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #000;
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .main { margin-left: 0; }
+    }
+  
+    /* Notif Responsive Patch */
+    @media (max-width: 992px) {
+      .main { margin-left: 0; width: 100vw; height: 100vh; overflow-y: auto;}
+      .content-frame { height: calc(100vh - 70px) !important; width: 100vw !important; border: none; }
+      body { overflow: hidden; }
+      .topbar { padding: 10px 15px !important; }
+      .topbar-title { font-size: 16px !important; }
+    }
+
+</style>
+<script src="../../assets/js/config.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="fas fa-shield-alt"></i>
+      PLASI<span>SE</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="index.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      
+      <div class="nav-section">Catálogo</div>
+      <a href="productos.html" class="nav-item"><i class="fas fa-boxes"></i> Productos</a>
+      <a href="categorias.html" class="nav-item"><i class="fas fa-folder-tree"></i> Categorías</a>
+      <a href="marcas.html" class="nav-item"><i class="fas fa-tags"></i> Marcas</a>
+      
+      <div class="nav-section">Ventas</div>
+      <a href="pedidos.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+      
+      <div class="nav-section">Usuarios</div>
+      <a href="usuarios.html" class="nav-item"><i class="fas fa-users"></i> Usuarios</a>
+      
+      <div class="nav-section">Sistema</div>
+      <a href="eventos.html" class="nav-item"><i class="fas fa-microchip"></i> Eventos Log</a>
+      <a href="notificaciones.html" class="nav-item active"><i class="fas fa-bell"></i> Notificaciones</a>
+
+      <a href="../index.html" class="nav-item"><i class="fas fa-external-link-alt"></i> Ver Tienda</a>
+      <a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')" title="Abrir Menú" aria-label="Abrir menú de navegación">
+          <i class="fas fa-bars fa-lg"></i>
+        </button>
+        <h1 class="topbar-title">Centro de Notificaciones Push</h1>
+      </div>
+      <div class="topbar-user">
+        <span id="adminName">Admin</span>
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:36px;height:36px">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- Push Admin Panel Iframe -->
+    <iframe id="pushFrame" class="content-frame" title="Push Admin Panel" sandbox="allow-scripts allow-forms allow-same-origin allow-popups"></iframe>
+  </main>
+
+  <script>
+    // Configuración dinámica del Iframe
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const iframe = document.getElementById('pushFrame');
+    
+    // Puerto del sistema Push: 3100 (EasyPanel usa 3000)
+    if (isLocal) {
+        iframe.src = 'http://localhost:3100/admin';
+    } else {
+        // En producción (EasyPanel), el push corre como servicio separado
+        iframe.src = 'https://n0cker-push.v6hb8q.easypanel.host/admin';
+    }
+
+    const API = isLocal ? 'http://localhost:5000/api/v1' : 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1';
+
+    // Auth Check (Igual que en index.html)
+    async function checkAuth() {
+      try {
+        const r = await fetch(`${API}/auth/session`, { credentials: 'include' });
+        const d = await r.json();
+        if (!d.authenticated || (d.user.rol !== 'admin' && d.user.rol !== 'super_admin' && d.user.rol !== 'administrador')) {
+          window.location.href = '../login.html?redirect=admin/notificaciones.html';
+          return false;
+        }
+        document.getElementById('adminName').textContent = d.user.nombre;
+        return true;
+      } catch(e) {
+        window.location.href = '../login.html?redirect=admin/notificaciones.html';
+        return false;
+      }
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' });
+      window.location.href = '../login.html';
+    });
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+    });
+  </script>
+</body>
+</html>

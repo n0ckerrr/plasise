@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle del Producto - PLASISE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0a0a0f;
+      --primary-light: #1a1a2e;
+      --accent: #c8a45e;
+      --accent-light: #d4b978;
+      --text: #333;
+      --text-light: #666;
+      --bg: #fff;
+      --bg-alt: #f8f9fa;
+      --border: #e5e5e5;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* Header */
+    .site-header {
+        background: var(--primary);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .header-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 40px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .logo:hover { color: var(--accent); }
+
+    .main-nav { display: flex; align-items: center; gap: 8px; }
+
+    .main-nav>a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .main-nav>a:hover, .main-nav>a.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+
+    .cart-btn {
+        position: relative;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 4px;
+        display: none;
+    }
+
+    .cart-btn.show { display: flex; }
+
+    .cart-btn:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        min-width: 18px;
+        height: 18px;
+        background: var(--accent);
+        color: var(--primary);
+        font-size: 10px;
+        font-weight: 600;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-btn {
+        background: var(--accent);
+        color: var(--primary);
+        padding: 10px 24px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .login-btn:hover { background: var(--accent-light); }
+
+    /* User Dropdown */
+    .user-dropdown { position: relative; display: none; }
+    .user-dropdown.show { display: block; }
+
+    .user-btn {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 14px; background: rgba(255, 255, 255, 0.1);
+        border: none; border-radius: 4px; color: #fff;
+        font-size: 13px; cursor: pointer;
+    }
+
+    .user-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+    .user-menu {
+        position: absolute; top: calc(100% + 8px); right: 0;
+        min-width: 220px; background: #fff; border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        opacity: 0; visibility: hidden; transform: translateY(-10px);
+        transition: all 0.2s; z-index: 100; overflow: hidden;
+    }
+
+    .user-dropdown.open .user-menu {
+        opacity: 1; visibility: visible; transform: translateY(0);
+    }
+
+    .user-menu-header {
+        padding: 16px; background: var(--bg-alt);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .user-menu-header strong { display: block; font-size: 14px; }
+    .user-menu-header small { color: var(--text-light); font-size: 12px; }
+
+    .user-menu a {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 16px; color: var(--text);
+        text-decoration: none; font-size: 13px;
+    }
+
+    .user-menu a:hover { background: var(--bg-alt); }
+    .user-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .user-menu a.logout { color: #dc3545; }
+
+    /* Product Specific Styles */
+    .breadcrumb-nav { padding: 24px 0; }
+    .breadcrumb-item a { color: var(--accent); text-decoration: none; font-size: 13px; }
+    .breadcrumb-item.active { color: var(--text-light); font-size: 13px; }
+
+    .product-detail-container {
+        background: #fff; border: 1px solid var(--border);
+        border-radius: 8px; overflow: hidden; margin-bottom: 32px;
+    }
+
+    .product-image-section {
+        padding: 40px; background: #fff;
+        display: flex; align-items: center; justify-content: center;
+        border-right: 1px solid var(--border); height: 100%;
+    }
+
+    .product-image-section img { max-width: 100%; height: auto; transition: transform 0.3s; }
+
+    .product-info-section { padding: 48px; }
+    .product-sku-detail { color: var(--text-light); font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; }
+    .product-title-detail { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 16px; color: var(--primary); }
+    
+    .product-brand-badge {
+        display: inline-flex; align-items: center;
+        background: var(--bg-alt); color: var(--text-light);
+        padding: 6px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 24px;
+    }
+
+    .stock-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 12px; border-radius: 4px; font-size: 12px;
+        font-weight: 600; margin-left: 12px;
+    }
+    .stock-available { color: #28a745; background: rgba(40, 167, 69, 0.1); }
+    .stock-low { color: #fd7e14; background: rgba(253, 126, 20, 0.1); }
+    .stock-out { color: #dc3545; background: rgba(220, 53, 69, 0.1); }
+
+    .product-price-detail { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+    .product-price-note { color: var(--text-light); font-size: 14px; margin-bottom: 32px; }
+
+    .product-description { color: var(--text-light); line-height: 1.6; margin-bottom: 32px; }
+
+    .spec-item {
+        display: flex; justify-content: space-between;
+        padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .spec-label { font-weight: 600; font-size: 14px; }
+    .spec-value { color: var(--text-light); font-size: 14px; }
+
+    .quantity-selector { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+    .quantity-input { width: 80px; text-align: center; }
+
+    .btn-add-cart-large {
+        background: var(--primary); color: #fff;
+        padding: 16px 40px; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 1px; flex: 1; border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .btn-add-cart-large:hover:not(:disabled) { background: #1a1a2e; transform: translateY(-2px); }
+    .btn-add-cart-large:disabled { background: #ccc; cursor: not-allowed; }
+
+    .whatsapp-support {
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        color: #25d366; text-decoration: none; font-weight: 600;
+        padding: 16px; border: 1px solid #25d366; border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .whatsapp-support:hover { background: rgba(37, 211, 102, 0.05); }
+
+    .product-actions { display: flex; gap: 16px; }
+
+    .loading-container { display: flex; flex-direction: column; align-items: center; padding: 100px 0; }
+  </style>
+<script src="../assets/js/config.js"></script>
+</head>
+
+<body>
+
+  <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">PLASISE</a>
+            <button class="mobile-toggle" title="Abrir menú" onclick="document.querySelector('.main-nav').classList.toggle('show')">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <a href="index.html" >Inicio</a>
+                <a href="productos.html" class="active">Productos</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+            <div class="header-actions">
+                <a href="carrito.html" class="cart-btn" id="cartBtn" title="Ver mi carrito">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+                <a href="login.html" class="login-btn" id="loginBtn">Acceder</a>
+
+                <!-- User Dropdown -->
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-btn" title="Menú de usuario" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-menu-header">
+                            <strong id="userFullName"></strong>
+                            <small id="userEmail"></small>
+                        </div>
+                        <a href="admin/productos.html" id="adminLink" style="display: none;"><i
+                                class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
+                        <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
+                        <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
+                        <a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Direcciones</a>
+                        <div class="user-menu-divider"></div>
+                        <a href="#" class="logout" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+  <!-- Breadcrumb -->
+  <div class="container breadcrumb-nav">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="productos.html">Productos</a></li>
+        <li class="breadcrumb-item active" aria-current="page" id="breadcrumbProduct">Cargando...</li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container pb-5">
+    <div id="productContent">
+      <!-- Loading State -->
+      <div class="loading-container">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3 text-muted">Cargando producto...</p>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products" id="relatedProducts" style="display: none;">
+      <h4><i class="fas fa-th-large me-2"></i>Productos Relacionados</h4>
+      <div class="row g-4" id="relatedProductsGrid">
+        <!-- Related products will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container text-center">
+      <p>&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_BASE_URL = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+    let isLoggedIn = false;
+    let currentProduct = null;
+
+    // Obtener ID del producto de la URL
+    function getProductId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // Verificar sesión
+    async function checkUserSession() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/session`, { credentials: 'include' });
+        const data = await response.json();
+        if (data.authenticated) {
+          isLoggedIn = true;
+          userRole = data.user.rol;
+          
+          if(document.getElementById('loginBtn')) document.getElementById('loginBtn').style.display = 'none';
+          if(document.getElementById('userDropdown')) document.getElementById('userDropdown').classList.add('show');
+          if(document.getElementById('userName')) document.getElementById('userName').textContent = data.user.nombre;
+          if(document.getElementById('userFullName')) document.getElementById('userFullName').textContent = data.user.nombre + ' ' + (data.user.apellidos || '');
+          if(document.getElementById('userEmail')) document.getElementById('userEmail').textContent = data.user.email || '';
+          if(document.getElementById('cartBtn')) document.getElementById('cartBtn').classList.add('show');
+
+          // Mostrar link admin si es administrador
+          if (data.user.rol === 'admin' || data.user.rol === 'administrador') {
+             const adminLink = document.getElementById('adminLink');
+             if (adminLink) {
+                 adminLink.style.display = 'flex';
+                 adminLink.classList.remove('d-none');
+             }
+          }
+
+          // Ocultar banner de login
+          const banner = document.getElementById('loginBanner');
+          if(banner) banner.classList.add('hidden');
+        } else {
+          // Ocultar filtro de precio para usuarios no logueados
+          const priceFilter = document.getElementById('priceFilterSection');
+          if(priceFilter) priceFilter.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error verificando sesión:', error);
+      }
+    }
+
+    // Toggle menu
+    function toggleUserMenu() {
+        document.getElementById('userDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    async function logout() {
+        try {
+            await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+            window.location.reload();
+        } catch (err) { window.location.reload(); }
+    }
+
+    // Cargar detalle del producto
+    async function loadProduct() {
+      const productId = getProductId();
+
+      if (!productId) {
+        showError('No se especificó un producto');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/products/${productId}`);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          showError(data.error || 'Producto no encontrado');
+          return;
+        }
+
+        currentProduct = data.product;
+        renderProduct(currentProduct);
+        loadRelatedProducts(currentProduct.categoria_id, currentProduct.id);
+
+      } catch (error) {
+        console.error('Error:', error);
+        showError('Error al cargar el producto');
+      }
+    }
+
+    // Renderizar producto
+    function renderProduct(product) {
+      document.title = `${product.nombre} - PLASISE`;
+      document.getElementById('breadcrumbProduct').textContent = product.nombre;
+
+      // Determinar estado del stock
+      let stockBadge = '';
+      if (product.stock > 10) {
+        stockBadge = '<span class="stock-badge stock-available"><i class="fas fa-check-circle"></i> En stock</span>';
+      } else if (product.stock > 0) {
+        stockBadge = `<span class="stock-badge stock-low"><i class="fas fa-exclamation-circle"></i> Quedan ${product.stock} unidades</span>`;
+      } else {
+        stockBadge = '<span class="stock-badge stock-out"><i class="fas fa-times-circle"></i> Sin stock</span>';
+      }
+
+      const html = `
+        <div class="product-detail-container">
+          <div class="row g-0">
+            <div class="col-lg-5">
+              <div class="product-image-section">
+                <img src="${product.imagen_principal || 'https://via.placeholder.com/500x400?text=Sin+Imagen'}" 
+                     alt="${product.nombre}"
+                     onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="product-info-section">
+                <div class="product-sku-detail">SKU: ${product.sku || 'N/A'}</div>
+                <h1 class="product-title-detail">${product.nombre}</h1>
+                
+                ${product.marca_nombre ? `<span class="product-brand-badge"><i class="fas fa-tag me-1"></i>${product.marca_nombre}</span>` : ''}
+                
+                ${stockBadge}
+                
+                <div class="product-price-detail">${formatPrice(product.precio_base)}</div>
+                <div class="product-price-note">+ IVA | PVP Recomendado: ${product.precio_pvp_recomendado ? formatPrice(product.precio_pvp_recomendado) : 'N/A'}</div>
+                
+                ${product.descripcion_corta ? `<p class="product-description">${product.descripcion_corta}</p>` : ''}
+                
+                <div class="product-specs">
+                  <h5><i class="fas fa-list-ul me-2"></i>Especificaciones</h5>
+                  ${product.sku ? `<div class="spec-item"><span class="spec-label">SKU</span><span class="spec-value">${product.sku}</span></div>` : ''}
+                  ${product.peso ? `<div class="spec-item"><span class="spec-label">Peso</span><span class="spec-value">${product.peso} kg</span></div>` : ''}
+                  ${product.dimensiones ? `<div class="spec-item"><span class="spec-label">Dimensiones</span><span class="spec-value">${product.dimensiones}</span></div>` : ''}
+                  ${product.garantia_meses ? `<div class="spec-item"><span class="spec-label">Garantía</span><span class="spec-value">${product.garantia_meses} meses</span></div>` : ''}
+                  <div class="spec-item"><span class="spec-label">Disponibilidad</span><span class="spec-value">${product.stock > 0 ? 'Disponible' : 'Bajo pedido'}</span></div>
+                </div>
+                
+                <div class="quantity-selector">
+                  <label for="quantity">Cantidad:</label>
+                  <input type="number" id="quantity" class="form-control quantity-input" title="Cantidad de productos" value="1" min="1" max="${product.stock || 99}">
+                </div>
+                
+                <div class="product-actions">
+                  <button class="btn btn-add-cart-large" onclick="addToCart(${product.id})" ${product.stock === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-cart-plus me-2"></i>${product.stock === 0 ? 'Sin Stock' : 'Añadir al Carrito'}
+                  </button>
+                  <a href="https://wa.me/34931234567?text=Hola, me interesa el producto: ${encodeURIComponent(product.nombre)} (SKU: ${product.sku || 'N/A'})" 
+                     class="whatsapp-support" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-whatsapp"></i> Consultar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        ${product.descripcion_larga ? `
+        <div class="product-detail-container mt-4">
+          <div class="p-4">
+            <h4 class="mb-3"><i class="fas fa-info-circle me-2"></i>Descripción Completa</h4>
+            <div class="product-description">${product.descripcion_larga}</div>
+          </div>
+        </div>
+        ` : ''}
+      `;
+
+      document.getElementById('productContent').innerHTML = html;
+    }
+
+    // Mostrar error
+    function showError(message) {
+      document.getElementById('productContent').innerHTML = `
+        <div class="error-container">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Producto no encontrado</h3>
+          <p class="text-muted">${message}</p>
+          <a href="productos.html" class="btn btn-primary mt-3">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Catálogo
+          </a>
+        </div>
+      `;
+    }
+
+    // Cargar productos relacionados
+    async function loadRelatedProducts(categoriaId, excludeId) {
+      if (!categoriaId) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/products?categoria=${categoriaId}&per_page=4`);
+        const data = await response.json();
+
+        if (data.success && data.products && data.products.length > 0) {
+          const related = data.products.filter(p => p.id !== excludeId).slice(0, 4);
+
+          if (related.length > 0) {
+            const grid = document.getElementById('relatedProductsGrid');
+            grid.innerHTML = related.map(p => `
+              <div class="col-lg-3 col-md-6">
+                <div class="product-card" onclick="window.location.href='producto-detalle.html?id=${p.id}'">
+                  <img src="${p.imagen_principal || 'https://via.placeholder.com/400x300?text=Sin+Imagen'}" 
+                       alt="${p.nombre}"
+                       onerror="this.src='https://via.placeholder.com/400x300?text=Sin+Imagen'">
+                  <div class="card-body">
+                    <div class="product-title">${p.nombre}</div>
+                    <div class="product-sku text-muted small">${p.sku || ''}</div>
+                    <div class="product-price mt-2">${formatPrice(p.precio_base)}</div>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+
+            document.getElementById('relatedProducts').style.display = 'block';
+          }
+        }
+      } catch (error) {
+        console.error('Error al cargar productos relacionados:', error);
+      }
+    }
+
+    // Añadir al carrito
+    async function addToCart(productId) {
+      if (!isLoggedIn) {
+        alert('Por favor inicie sesión para añadir productos al carrito');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const cantidad = parseInt(document.getElementById('quantity').value) || 1;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/cart/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ producto_id: productId, cantidad: cantidad })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          loadCartCount();
+          showToast('Producto añadido al carrito', 'success');
+        } else {
+          showToast(data.error || 'Error al añadir al carrito', 'danger');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('Error de conexión', 'danger');
+      }
+    }
+
+    // Formatear precio
+    function formatPrice(price) {
+      return new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'EUR'
+      }).format(price);
+    }
+
+    // Mostrar toast
+    function showToast(message, type) {
+      const toast = document.createElement('div');
+      toast.className = `alert alert-${type} position-fixed top-0 start-50 translate-middle-x mt-3`;
+      toast.style.zIndex = '9999';
+      toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>${message}`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Inicializar al cargar la página
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkUserSession();
+      await loadProduct();
+      await loadCartCount();
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-5 mt-5">
+    <div class="container text-center">
+      <p class="mb-3" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; letter-spacing: 2px;">PLASISE</p>
+      <p class="mb-2 text-white-50 small">&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+      <div class="legal-links small">
+        <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a>
+        <a href="legales/politica-privacidad.html" class="text-white-50 text-decoration-none mx-2">Privacidad</a>
+        <a href="legales/politica-cookies.html" class="text-white-50 text-decoration-none mx-2">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Chatbot -->
+  <link rel="stylesheet" href="../assets/css/chatbot.css">
+  <script src="../assets/js/chatbot.js"></script>
+  <!-- Cookies Banner -->
+  <link rel="stylesheet" href="../assets/css/cookies.css">
+  <script src="../assets/js/cookies.js"></script>
+</body>
+
+</html>

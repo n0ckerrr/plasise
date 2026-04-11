@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLASISE - Distribución de Seguridad Electrónica</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Header */
+        .top-bar {
+            background-color: #34495e;
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link {
+            color: var(--primary-color) !important;
+            font-weight: 500;
+            padding: 10px 15px !important;
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color) !important;
+        }
+
+        /* Search bar */
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            border-radius: 20px;
+            padding-right: 40px;
+        }
+
+        .search-box button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #999;
+        }
+
+        /* Slider / Banner */
+        .hero-slider {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero-slider h1 {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .hero-slider p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Category boxes */
+        .category-box {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            height: 100%;
+        }
+
+        .category-box:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .category-box i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .category-box h3 {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .category-box p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Product card */
+        .product-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-card .card-body {
+            padding: 15px;
+        }
+
+        .product-card .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .product-card .product-sku {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .product-card .product-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .product-card .btn-add-cart {
+            width: 100%;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .product-card .btn-add-cart:hover {
+            background-color: #2980b9;
+        }
+
+        /* Section titles */
+        .section-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+
+        /* Features */
+        .feature-box {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-box i {
+            font-size: 50px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .feature-box h4 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        footer h5 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer ul li {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: #bdc3c7;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    
+/* Responsive patches by script */
+@media (max-width: 992px) {
+    .site-header { position: relative !important; }
+    .hero { padding: 60px 20px !important; }
+    .hero h1 { font-size: 2.2rem !important; margin-top: 15px !important; line-height: 1.2 !important; }
+    .header-actions { flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .login-btn { padding: 8px 12px !important; font-size: 13px !important; }
+    .cart-btn { padding: 8px !important; }
+    .categories-grid { display: flex !important; flex-direction: column !important; gap: 16px !important; }
+    .footer-grid { display: flex !important; flex-direction: column !important; gap: 20px !important; }
+    .hero-content { margin-top: 20px; }
+    body { padding-bottom: 80px; } /* Cookie banner space */
+}
+
+</style>
+</head>
+
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <i class="fas fa-phone"></i> +34 93 123 45 67
+                    <span class="ms-3"><i class="fas fa-envelope"></i> info@plasise.com</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a></a> href="#" class="text-white me-3"><i class="fab fa-facebook"></i></a>
+                    <a></a> href="#" class="text-white me-3"><i class="fab fa-linkedin"></i></a>
+                    <a> href="#" class="text-white"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">PLASISE</a>
+            <button>class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="productosDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            Productos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/productos.html?cat=video">Vídeo / CCTV</a></li>
+                            <li><a class="dropdown-item" href="/productos.html?cat=accesos">Control de Accesos</a></li>
+                            <li><a class="dropdown-item" href="/productos.html?cat=intrusion">Intrusión</a></li>
+                            <li><a class="dropdown-item" href="/productos.html?cat=incendio">Incendio</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/marcas.html">Marcas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/recursos.html">Recursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contacto.html">Contacto</a>
+                    </li>
+                </ul>
+
+                <!-- Search -->
+                <form> class="d-flex me-3 search-box" style="width: 300px;" id="searchForm">
+                    <input class="form-control" type="search" placeholder="Buscar productos..." id="searchInput">
+                    <button class>="fas fa-search" type="button"></button>
+                </form>
+
+                <!-- Cart & User -->
+                <div class="d-flex align-items-center">
+                    <a href="/carrito.html" class="btn btn-link position-relative me-3">
+                        <i class="fas fa-shopping-cart fa-lg"></i>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+
+                    <div id="userSection">
+                        <!-- Login button (shown when not logged in) -->
+                        <a href="/login.html" class="btn btn-primary" id="loginBtn">
+                            <i class="fas fa-user"></i> Acceder
+                        </a>
+
+                        <!-- User dropdown (shown when logged in) -->
+                        <div class="dropdown d-none" id="userDropdown">
+                            <button>class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> <span id="userName"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/perfil.html"><i class="fas fa-user"></i> Mi
+                                        Perfil</a></li>
+                                <li><a class="dropdown-item" href="/pedidos.html"><i class="fas fa-box"></i> Mis
+                                        Pedidos</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i>
+                                        Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Slider -->
+    <section class="hero-slider">
+        <div class="container">
+            <h1>Distribución Profesional de Seguridad</h1>
+            <p>Soluciones completas en Videovigilancia, Control de Accesos, Intrusión e Incendio</p>
+            <a href="/productos.html" class="btn btn-light btn-lg me-2">Ver Catálogo</a>
+            <a href="/registro.html" class="btn btn-outline-light btn-lg">Registrarse</a>
+        </div>
+    </section>
+
+    <!-- Categorías Principales -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">Nuestras Categorías</h2>
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <a href="/productos.html?cat=video" class="text-decoration-none">
+                        <div class="category-box">
+                            <i class="fas fa-video"></i>
+                            <h3>VÍDEO</h3>
+                            <p>Cámaras IP, DVR, NVR<br>Sistemas CCTV</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="/productos.html?cat=accesos" class="text-decoration-none">
+                        <div class="category-box">
+                            <i class="fas fa-door-open"></i>
+                            <h3>ACCESOS</h3>
+                            <p>Control de Accesos<br>Lectores y Cerraduras</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="/productos.html?cat=intrusion" class="text-decoration-none">
+                        <div class="category-box">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>INTRUSIÓN</h3>
+                            <p>Sistemas de Alarma<br>Detectores</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="/productos.html?cat=incendio" class="text-decoration-none">
+                        <div class="category-box">
+                            <i class="fas fa-fire"></i>
+                            <h3>INCENDIO</h3>
+                            <p>Detección de Incendios<br>Sistemas PCI</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Productos Destacados -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title">Productos Destacados</h2>
+            <div class="row" id="featuredProducts">
+                <!-- Products will be loaded here via JavaScript -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/productos.html" class="btn btn-primary btn-lg">Ver Todos los Productos</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-box">
+                        <i class="fas fa-shipping-fast"></i>
+                        <h4>Entrega Rápida</h4>
+                        <p>Envíos en 24-48h</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-box">
+                        <i class="fas fa-box-open"></i>
+                        <h4>Amplio Stock</h4>
+                        <p>Miles de referencias</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-box">
+                        <i class="fas fa-headset"></i>
+                        <h4>Soporte Técnico</h4>
+                        <p>Asesoramiento experto</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-box">
+                        <i class="fas fa-award"></i>
+                        <h4>Mejores Marcas</h4>
+                        <p>Distribuidores oficiales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>PLASISE</h5>
+                    <p>Distribución profesional de sistemas de seguridad electrónica</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Productos</h5>
+                    <ul>
+                        <li><a href="/productos.html?cat=video">Vídeo / CCTV</a></li>
+                        <li><a href="/productos.html?cat=accesos">Control de Accesos</a></li>
+                        <li><a href="/productos.html?cat=intrusion">Intrusión</a></li>
+                        <li><a href="/productos.html?cat=incendio">Incendio</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Empresa</h5>
+                    <ul>
+                        <li><a href="/sobre-nosotros.html">Sobre Nosotros</a></li>
+                        <li><a href="/marcas.html">Marcas</a></li>
+                        <li><a href="/blog.html">Blog</a></li>
+                        <li><a href="/contacto.html">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contacto</h5>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +34 93 123 45 67</li>
+                        <li><i class="fas fa-envelope"></i> info@plasise.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Barcelona, España</li>
+                    </ul>
+                </div>
+            </div>
+            <hr> class="my-4" style="border-color: #34495e;">
+            <div class="text-center">
+                <p>&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script>
+        // API Base URL
+        const API_URL = 'http://localhost:5000/api/v1';
+
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_URL}/auth/session`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (data.authenticated) {
+                    document.getElementById('loginBtn').classList.add('d-none');
+                    document.getElementById('userDropdown').classList.remove('d-none');
+                    document.getElementById('userName').textContent = data.user.nombre;
+                }
+            } catch (error) {
+                console.error('Error checking auth:', error);
+            }
+        }
+
+        // Load featured products
+        async function loadFeaturedProducts() {
+            try {
+                const response = await fetch(`${API_URL}/products?destacado=1&per_page=8`);
+                const data = await response.json();
+
+                const container = document.getElementById('featuredProducts');
+                container.innerHTML = '';
+
+                if (data.products && data.products.length > 0) {
+                    data.products.forEach(product => {
+                        const productCard = `
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="product-card">
+                                    <img src="${product.imagen_principal || '/assets/images/placeholder.jpg'}" alt="${product.nombre}">
+                                    <div class="card-body">
+                                        <div class="product-title">${product.nombre}</div>
+                                        <div class="product-sku">${product.sku}</div>
+                                        <div class="product-price">${formatPrice(product.precio_base)}</div>
+                                        <small class="text-muted">+ IVA</small>
+                                        <button class="btn-add-cart mt-2" onclick="addToCart(${product.id})">
+                                            <i class="fas fa-cart-plus"></i> Añadir
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML += productCard;
+                    });
+                } else {
+                    container.innerHTML = '<div class="col-12 text-center"><p>No hay productos destacados disponibles</p></div>';
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('featuredProducts').innerHTML =
+                    '<div class="col-12 text-center"><p class="text-danger">Error al cargar productos</p></div>';
+            }
+        }
+
+        // Load cart count
+        async function loadCartCount() {
+            try {
+                const response = await fetch(`${API_URL}/cart`, {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('cartCount').textContent = data.items_count || 0;
+                }
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+        }
+
+        // Add to cart
+        async function addToCart(productId) {
+            try {
+                const response = await fetch(`${API_URL}/cart/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        producto_id: productId,
+                        cantidad: 1
+                    })
+                });
+
+                if (response.ok) {
+                    loadCartCount();
+                    alert('Producto añadido al carrito');
+                } else if (response.status === 401) {
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error al añadir al carrito');
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn')?.addEventListener('click', async function (e) {
+            e.preventDefault();
+            try {
+                await fetch(`${API_URL}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                window.location.reload();
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
+
+        // Search
+        document.getElementById('searchForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                window.location.href = `/productos.html?search=${encodeURIComponent(query)}`;
+            }
+        });
+
+        // Format price
+        function formatPrice(price) {
+            return new Intl.NumberFormat('es-ES', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(price);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            checkAuth();
+            loadFeaturedProducts();
+            loadCartCount();
+        });
+    </script>
+</body>
+
+</html>

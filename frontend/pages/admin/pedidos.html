@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Pedidos - Admin PLASISE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --primary: #2c3e50; --secondary: #3498db; --accent: #c8a45e; }
+    body { font-family: 'Segoe UI', sans-serif; background: #fafafa; }
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 250px; background: var(--primary); color: #fff; z-index: 100; }
+    .sidebar-brand { padding: 20px; font-size: 24px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-brand span { color: var(--accent); }
+    .sidebar-nav { padding: 20px 0; }
+    .nav-item { display: block; padding: 12px 20px; color: rgba(255,255,255,0.7); text-decoration: none; border-left: 3px solid transparent; }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; border-left-color: var(--accent); }
+    .nav-item i { width: 25px; margin-right: 10px; }
+    .nav-section { padding: 10px 20px 5px; font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+    .main-content { margin-left: 250px; padding: 20px; }
+    .top-bar { background: #fff; padding: 15px 25px; margin: -20px -20px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .card { border: none; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .table th { background: #f8f9fa; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+    .table td { vertical-align: middle; }
+    .btn { border-radius: 8px; }
+    .btn-primary { background: var(--secondary); border-color: var(--secondary); }
+    .modal-content { border-radius: 15px; }
+    .order-item { padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; }
+  </style>
+<script src="../../assets/js/config.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-brand">PLASI<span>SE</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="index.html" class="nav-item"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+      <div class="nav-section">Catálogo</div>
+      <a href="productos.html" class="nav-item"><i class="fas fa-box"></i>Productos</a>
+      <a href="categorias.html" class="nav-item"><i class="fas fa-folder"></i>Categorías</a>
+      <a href="marcas.html" class="nav-item"><i class="fas fa-tags"></i>Marcas</a>
+      <div class="nav-section">Ventas</div>
+      <a href="pedidos.html" class="nav-item active"><i class="fas fa-shopping-cart"></i>Pedidos</a>
+      <a href="usuarios.html" class="nav-item"><i class="fas fa-users"></i>Usuarios</a>
+      <div class="nav-section">Sistema</div>
+      <a href="eventos.html" class="nav-item"><i class="fas fa-microchip"></i> Eventos Log</a>
+      <a href="notificaciones.html" class="nav-item"><i class="fas fa-bell"></i> Notificaciones</a>
+
+      <a href="../index.html" class="nav-item"><i class="fas fa-globe"></i>Ver Tienda</a>
+      <a href="#" class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Cerrar Sesión</a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="top-bar">
+      <h4><i class="fas fa-shopping-cart me-2"></i>Gestión de Pedidos</h4>
+      <div class="d-flex gap-2">
+        <select class="form-select" id="filterEstado" style="width:auto" title="Filtrar por estado del pedido">
+          <option value="">Todos los estados</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="en_preparacion">En Preparación</option>
+          <option value="enviado">Enviado</option>
+          <option value="entregado">Entregado</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>Nº Pedido</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Pago</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="pedidosTable">
+            <tr><td colspan="7" class="text-center py-4"><div class="spinner-border"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+          <span id="totalInfo" class="text-muted">-</span>
+          <nav><ul class="pagination pagination-sm mb-0" id="pagination"></ul></nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Pedido <span id="modalOrderNum"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" title="Cerrar modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p><strong>Cliente:</strong> <span id="modalCliente"></span></p>
+              <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+              <p><strong>Fecha:</strong> <span id="modalFecha"></span></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Estado:</strong> 
+                <select class="form-select form-select-sm d-inline-block w-auto" id="modalEstado" title="Cambiar estado del pedido">
+                  <option value="pendiente">Pendiente</option>
+                  <option value="confirmado">Confirmado</option>
+                  <option value="en_preparacion">En Preparación</option>
+                  <option value="enviado">Enviado</option>
+                  <option value="entregado">Entregado</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+              </p>
+              <p><strong>Estado Pago:</strong> 
+                <select class="form-select form-select-sm d-inline-block w-auto" id="modalEstadoPago" title="Cambiar estado del pago">
+                  <option value="pendiente">Pendiente</option>
+                  <option value="pagado">Pagado</option>
+                  <option value="parcial">Parcial</option>
+                  <option value="reembolsado">Reembolsado</option>
+                </select>
+              </p>
+            </div>
+          </div>
+          <h6>Productos</h6>
+          <div id="modalItems"></div>
+          <hr>
+          <div class="text-end">
+            <h5>Total: <span id="modalTotal"></span></h5>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="modalNotas">Notas internas</label>
+            <textarea class="form-control" id="modalNotas" rows="2" title="Notas internas del pedido" placeholder="Añadir notas..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="updateOrder()">Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+    let orderModal, currentPage = 1, currentOrderId = null;
+
+    async function checkAdmin() {
+      const r = await fetch(`${API}/auth/session`, { credentials: 'include' });
+      const d = await r.json();
+      if (!d.authenticated || (d.user.rol !== 'admin' && d.user.rol !== 'super_admin' && d.user.rol !== 'administrador')) window.location.href = '../login.html';
+    }
+
+    async function loadOrders(page = 1) {
+      currentPage = page;
+      const tbody = document.getElementById('pedidosTable');
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="spinner-border spinner-border-sm"></div></td></tr>';
+      
+      const params = new URLSearchParams({ page, per_page: 15 });
+      const estado = document.getElementById('filterEstado').value;
+      if (estado) params.append('estado', estado);
+
+      try {
+        const r = await fetch(`${API}/admin/orders?${params}`, { credentials: 'include' });
+        const d = await r.json();
+        if (d.success && d.orders) {
+          tbody.innerHTML = d.orders.map(o => `
+            <tr>
+              <td><strong>${o.numero_pedido || '#' + o.id}</strong></td>
+              <td>${formatDate(o.fecha)}</td>
+              <td>${o.cliente_nombre || 'N/A'}<br><small class="text-muted">${o.cliente_email || ''}</small></td>
+              <td><strong>${formatPrice(o.total)}</strong></td>
+              <td><span class="badge ${getBadgeClass(o.estado)}">${o.estado}</span></td>
+              <td><span class="badge ${o.estado_pago === 'pagado' ? 'bg-success' : 'bg-warning'}">${o.estado_pago}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="viewOrder(${o.id})"><i class="fas fa-eye"></i></button>
+              </td>
+            </tr>
+          `).join('');
+          document.getElementById('totalInfo').textContent = `${d.total} pedidos`;
+          renderPagination(d.total, d.page, d.pages);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No hay pedidos</td></tr>';
+        }
+      } catch(e) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error</td></tr>'; }
+    }
+
+    async function viewOrder(id) {
+      currentOrderId = id;
+      try {
+        const r = await fetch(`${API}/admin/orders/${id}`, { credentials: 'include' });
+        const d = await r.json();
+        if (d.success && d.order) {
+          const o = d.order;
+          document.getElementById('modalOrderNum').textContent = o.numero_pedido || '#' + o.id;
+          document.getElementById('modalCliente').textContent = o.cliente_nombre || 'N/A';
+          document.getElementById('modalEmail').textContent = o.cliente_email || '-';
+          document.getElementById('modalFecha').textContent = formatDate(o.fecha);
+          document.getElementById('modalEstado').value = o.estado;
+          document.getElementById('modalEstadoPago').value = o.estado_pago;
+          document.getElementById('modalTotal').textContent = formatPrice(o.total);
+          document.getElementById('modalNotas').value = o.notas_internas || '';
+          
+          document.getElementById('modalItems').innerHTML = (o.items || []).map(i => `
+            <div class="order-item d-flex justify-content-between align-items-center">
+              <div>
+                <strong>${i.nombre || 'Producto'}</strong><br>
+                <small class="text-muted">${i.sku || ''} x ${i.cantidad}</small>
+              </div>
+              <div class="text-end">
+                <strong>${formatPrice(i.precio * i.cantidad)}</strong>
+              </div>
+            </div>
+          `).join('') || '<p class="text-muted">Sin items</p>';
+          
+          orderModal.show();
+        }
+      } catch(e) { alert('Error al cargar pedido'); }
+    }
+
+    async function updateOrder() {
+      if (!currentOrderId) return;
+      const data = {
+        estado: document.getElementById('modalEstado').value,
+        estado_pago: document.getElementById('modalEstadoPago').value,
+        notas_internas: document.getElementById('modalNotas').value
+      };
+      try {
+        const r = await fetch(`${API}/admin/orders/${currentOrderId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(data)
+        });
+        const d = await r.json();
+        if (d.success) { orderModal.hide(); loadOrders(currentPage); } else alert(d.error);
+      } catch(e) { alert('Error'); }
+    }
+
+    function getBadgeClass(estado) {
+      const c = { 'pendiente': 'bg-warning', 'confirmado': 'bg-info', 'en_preparacion': 'bg-primary', 'enviado': 'bg-success', 'entregado': 'bg-success', 'cancelado': 'bg-danger' };
+      return c[estado] || 'bg-secondary';
+    }
+
+    function renderPagination(total, current, pages) {
+      const nav = document.getElementById('pagination');
+      if (pages <= 1) { nav.innerHTML = ''; return; }
+      let html = `<li class="page-item ${current===1?'disabled':''}"><a class="page-link" href="#" onclick="loadOrders(${current-1});return false;">«</a></li>`;
+      for (let i = 1; i <= Math.min(pages, 10); i++) {
+        html += `<li class="page-item ${i===current?'active':''}"><a class="page-link" href="#" onclick="loadOrders(${i});return false;">${i}</a></li>`;
+      }
+      html += `<li class="page-item ${current===pages?'disabled':''}"><a class="page-link" href="#" onclick="loadOrders(${current+1});return false;">»</a></li>`;
+      nav.innerHTML = html;
+    }
+
+    function formatPrice(p) { return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(p || 0); }
+    function formatDate(d) { return d ? new Date(d).toLocaleDateString('es-ES') : '-'; }
+    async function logout() { await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' }); window.location.href = '../login.html'; }
+
+    document.getElementById('filterEstado').addEventListener('change', () => loadOrders(1));
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAdmin();
+      orderModal = new bootstrap.Modal(document.getElementById('orderModal'));
+      loadOrders();
+    });
+  </script>
+        <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+</html>

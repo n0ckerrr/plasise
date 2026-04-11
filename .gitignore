@@ -1,0 +1,22 @@
+# Entornos virtuales
+venv/
+venv_sync/
+env/
+.env
+
+# Temporales y logs
+.tmp/
+logs/
+*.bak
+*.log
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Otros
+n0cker-push/  # Asumiendo que es un repo o servicio aparte
+Demo.pdf
+processed_orders.json

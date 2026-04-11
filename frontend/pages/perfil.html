@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - PLASISE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a0a0f;
+            --primary-light: #16161d;
+            --accent: #c8a45e;
+            --accent-light: #d4b76a;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --text-light: #999;
+            --bg: #fff;
+            --bg-alt: #fafafa;
+            --border: #e8e8e8;
+            --success: #2d8a5f;
+            --warning: #b38600;
+            --danger: #b32d2d;
+        }
+
+        .logout-link { color: var(--danger) !important; }
+        .profile-form-footer {
+            margin-top: 40px; 
+            border-top: 1px solid var(--border); 
+            padding-top: 30px; 
+            display: flex; 
+            justify-content: flex-end;
+        }
+
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--bg-alt);
+        }
+
+        /* Header (Matching index.html) */
+        .site-header {
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            color: var(--accent);
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .main-nav a:hover,
+        .main-nav a.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .cart-btn {
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px;
+            display: none;
+            align-items: center;
+        }
+
+        .cart-btn.show {
+            display: flex;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-btn {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 10px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            position: relative;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 220px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .user-dropdown.open .user-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            padding: 16px;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-menu-header strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 2px;
+            color: var(--primary);
+        }
+
+        .user-menu-header small {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .user-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.15s;
+        }
+
+        .user-menu a:hover {
+            background: var(--bg-alt);
+        }
+
+        .user-menu i {
+            width: 16px;
+            color: var(--text-muted);
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        .user-menu a.logout {
+            color: var(--danger);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--primary);
+            padding: 80px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        /* Sidebar & Layout */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .account-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 60px;
+        }
+
+        .account-sidebar {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 40px 32px;
+            height: fit-content;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .account-user {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .account-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--bg-alt);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 40px;
+            color: var(--accent);
+            border: 2px solid var(--border);
+        }
+
+        .account-user h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .account-user p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .account-nav {
+            list-style: none;
+        }
+
+        .account-nav li {
+            margin-bottom: 12px;
+        }
+
+        .account-nav a {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 20px;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .account-nav a:hover {
+            background: var(--bg-alt);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .account-nav a.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .account-nav a.active i {
+            color: var(--accent);
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .content-card-header {
+            padding: 32px 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content-card-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .content-card-body {
+            padding: 40px;
+        }
+
+        /* Forms */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 15px;
+            transition: all 0.3s;
+            background: var(--bg-alt);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(200, 164, 94, 0.1);
+            background: #fff;
+        }
+
+        .form-control:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+
+        .btn-premium {
+            padding: 14px 32px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-premium:hover {
+            background: var(--accent);
+            color: var(--primary);
+            box-shadow: 0 8px 25px rgba(200, 164, 94, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #e6f5ef;
+            color: #2d8a5f;
+            border: 1px solid rgba(45, 138, 95, 0.2);
+        }
+
+        .alert-danger {
+            background: #fdf2f2;
+            color: #b32d2d;
+            border: 1px solid rgba(179, 45, 45, 0.2);
+        }
+
+        /* Footer (Premium matching) */
+        footer {
+            background: var(--primary);
+            color: rgba(255, 255, 255, 0.6);
+            padding: 100px 0 40px;
+            margin-top: 120px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 80px;
+            margin-bottom: 80px;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+
+        footer h5 {
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+
+        footer ul {
+            list-style: none;
+        }
+
+        footer ul li {
+            margin-bottom: 16px;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+            padding-left: 8px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 40px;
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 992px) {
+            .account-layout {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .header-container {
+                padding: 0 20px;
+                height: 80px;
+            }
+
+            .main-content {
+                padding: 40px 20px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+<script src="../assets/js/config.js"></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">PLASISE</a>
+            <nav class="main-nav d-none d-lg-flex">
+                <a href="index.html">Inicio</a>
+                <a href="productos.html">Productos</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+            <div class="header-actions">
+                <a href="carrito.html" class="cart-btn" id="cartBtn">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName">Cargando...</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-menu-header">
+                            <strong id="userFullName"></strong>
+                            <small id="userEmail"></small>
+                        </div>
+                        <a href="admin/dashboard.html" id="adminLink" style="display: none;"><i
+                                class="fas fa-tachometer-alt"></i> Dashboard Admin</a>
+                        <a href="perfil.html" class="active"><i class="fas fa-user"></i> Mi Perfil</a>
+                        <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
+                        <a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Direcciones</a>
+                        <div class="user-menu-divider"></div>
+                        <a href="#" class="logout" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <h1>Mi Perfil</h1>
+        <p>Gestiona tu cuenta profesional y datos de facturación</p>
+    </section>
+
+    <main class="main-content">
+        <div class="account-layout">
+            <aside class="account-sidebar">
+                <div class="account-user">
+                    <div class="account-avatar"><i class="fas fa-user"></i></div>
+                    <h3 id="sidebarName">-</h3>
+                    <p id="sidebarEmail">-</p>
+                </div>
+                <ul class="account-nav">
+                    <li><a href="perfil.html" class="active"><i class="fas fa-user"></i> Mi Perfil</a></li>
+                    <li><a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a></li>
+                    <li><a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Direcciones</a></li>
+                    <li><a href="#" class="logout logout-link" onclick="logout(); return false;"><i
+                                class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                </ul>
+            </aside>
+
+            <div class="content-card">
+                <div class="content-card-header">
+                    <h2>Información de Cuenta</h2>
+                </div>
+                <div class="content-card-body">
+                    <div id="alertContainer"></div>
+
+                    <form id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control" id="inputNombre" placeholder="Tu nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Apellidos</label>
+                                <input type="text" class="form-control" id="inputApellidos" placeholder="Tus apellidos" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" class="form-control" id="inputEmail" placeholder="ejemplo@email.com" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Teléfono de Contacto</label>
+                            <input type="tel" class="form-control" id="inputTelefono" placeholder="+34 600 000 000">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Empresa / Razón Social</label>
+                                <input type="text" class="form-control" id="inputEmpresa"
+                                    placeholder="Nombre comercial">
+                            </div>
+                            <div class="form-group">
+                                <label>NIF / CIF</label>
+                                <input type="text" class="form-control" id="inputNif" placeholder="B12345678">
+                            </div>
+                        </div>
+
+                        <div class="profile-form-footer">
+                            <button type="submit" class="btn-premium">
+                                <i class="fas fa-save"></i> Actualizar Información
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">PLASISE</div>
+                    <p>Distribución profesional de sistemas de seguridad electrónica y videovigilancia de alta gama.</p>
+                </div>
+                <div>
+                    <h5>Productos</h5>
+                    <ul>
+                        <li><a href="productos.html?cat=1">Video / CCTV</a></li>
+                        <li><a href="productos.html?cat=2">Control de Accesos</a></li>
+                        <li><a href="productos.html?cat=3">Intrusión</a></li>
+                        <li><a href="productos.html?cat=4">Incendio</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>Mi Cuenta</h5>
+                    <ul>
+                        <li><a href="perfil.html">Mi Perfil</a></li>
+                        <li><a href="pedidos.html">Mis Pedidos</a></li>
+                        <li><a href="carrito.html">Carrito</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>Contacto</h5>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +34 684 782 268</li>
+                        <li><i class="fas fa-envelope"></i> info@plasise.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Girona, España</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-2">&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+                <div class="legal-links small">
+                    <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a> | 
+                    <a href="legales/politica-privacidad.html" class="text-white-50 text-decoration-none mx-2">Privacidad</a> | 
+                    <a href="legales/politica-cookies.html" class="text-white-50 text-decoration-none mx-2">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API = '/api/v1';
+
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('open');
+        }
+
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        async function checkAuth() {
+            try {
+                const r = await fetch(API + '/auth/session', { credentials: 'include' });
+                const d = await r.json();
+
+                if (!d.authenticated) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                document.getElementById('userDropdown').classList.add('show');
+                document.getElementById('userName').textContent = d.user.nombre;
+                document.getElementById('userFullName').textContent = d.user.nombre + ' ' + (d.user.apellidos || '');
+                document.getElementById('userEmail').textContent = d.user.email || '';
+                document.getElementById('cartBtn').classList.add('show');
+
+                // Sidebar
+                document.getElementById('sidebarName').textContent = d.user.nombre + ' ' + (d.user.apellidos || '');
+                document.getElementById('sidebarEmail').textContent = d.user.email || '';
+
+                // Load extended profile data here!
+                try {
+                    const profileRes = await fetch(API + '/auth/profile', { credentials: 'include' });
+                    const profileData = await profileRes.json();
+                    if (profileData.success && profileData.user) {
+                        const user = profileData.user;
+                        document.getElementById('inputNombre').value = user.nombre || '';
+                        document.getElementById('inputApellidos').value = user.apellidos || '';
+                        document.getElementById('inputEmail').value = user.email || '';
+                        document.getElementById('inputTelefono').value = user.telefono || '';
+                        document.getElementById('inputEmpresa').value = user.empresa || '';
+                        document.getElementById('inputNif').value = user.cif || '';
+                    }
+                } catch (pe) {
+                    console.error('Error cargando perfil:', pe);
+                }
+
+                if (d.user.rol === 'admin' || d.user.rol === 'administrador') {
+                    const adminLink = document.getElementById('adminLink');
+                    if (adminLink) adminLink.style.display = 'flex';
+                }
+
+                loadCart();
+            } catch (e) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function logout() {
+            await fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' });
+            window.location.href = 'index.html';
+        }
+
+        async function loadCart() {
+            try {
+                const r = await fetch(API + '/cart', { credentials: 'include' });
+                const d = await r.json();
+                document.getElementById('cartCount').textContent = d.items_count || 0;
+            } catch (e) { }
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+            btn.disabled = true;
+
+            const data = {
+                nombre: document.getElementById('inputNombre').value,
+                apellidos: document.getElementById('inputApellidos').value,
+                telefono: document.getElementById('inputTelefono').value,
+                empresa: document.getElementById('inputEmpresa').value,
+                cif: document.getElementById('inputNif').value
+            };
+
+            try {
+                const r = await fetch(API + '/auth/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+
+                const alertCont = document.getElementById('alertContainer');
+                if (r.ok) {
+                    alertCont.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Cambios guardados con éxito.</div>';
+                    document.getElementById('userName').textContent = data.nombre;
+                    document.getElementById('userFullName').textContent = data.nombre + ' ' + data.apellidos;
+                    document.getElementById('sidebarName').textContent = data.nombre + ' ' + data.apellidos;
+                } else {
+                    alertCont.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Error al actualizar los datos.</div>';
+                }
+            } catch (e) {
+                document.getElementById('alertContainer').innerHTML = '<div class="alert alert-danger"><i class="fas fa-wifi"></i> Error de conexión.</div>';
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                setTimeout(() => document.getElementById('alertContainer').innerHTML = '', 4000);
+            }
+        });
+
+        checkAuth();
+    </script>
+        <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+
+</html>

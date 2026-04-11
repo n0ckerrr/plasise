@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  n0cker-push:
+    build: .
+    ports:
+      - "3100:3100"
+    environment:
+      - NODE_ENV=production
+      - PORT=3100
+      # Opcional: Especifica tus propias VAPID keys para producción
+      # - PUBLIC_VAPID_KEY=tu_clave_publica
+      # - PRIVATE_VAPID_KEY=tu_clave_privada
+    volumes:
+      - push-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3100/api/stats', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  push-data:
+    driver: local

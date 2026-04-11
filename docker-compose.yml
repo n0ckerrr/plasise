@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # PLASISE Backend - Flask API
+  # ============================================================================
+  plasise_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: n0cker_plasise
+    restart: unless-stopped
+    
+    ports:
+      - "5000:5000"
+    
+    environment:
+      # Base de datos
+      DB_HOST: 72.61.111.50
+      DB_PORT: 9966
+      DB_USER: plasise
+      DB_PASSWORD: plasise.
+      DB_NAME: plasise
+      
+      # Flask
+      FLASK_ENV: production
+      SECRET_KEY: aegis_super_secret_key_vps_stable
+      
+      # Holded
+      HOLDED_API_KEY: 5cc163c45bd3b739628642bdf89506c7
+    
+    # ⭐ MONTAJES PERSISTENTES - ESTO ES LO IMPORTANTE ⭐
+    volumes:
+      # Código de la aplicación (persistente)
+      - /etc/easypanel/projects/n0cker/plasise/code/backend:/code/backend
+      
+      # Logs (persistente)
+      - /etc/easypanel/projects/n0cker/plasise/data/logs:/code/backend/logs
+      
+      # Configuración (persistente)
+      - /etc/easypanel/projects/n0cker/plasise/data/config:/code/backend/config
+      
+      # Variables de entorno (persistente)
+      - /etc/easypanel/projects/n0cker/plasise/code/backend/.env:/code/backend/.env:ro
+    
+    networks:
+      - n0cker_network
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  n0cker_network:
+    external: true

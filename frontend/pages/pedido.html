@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle del Pedido - PLASISE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0a0a0f;
+      --primary-light: #16161d;
+      --accent: #c8a45e;
+      --accent-light: #d4b76a;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --text-light: #999;
+      --bg: #fff;
+      --bg-alt: #fafafa;
+      --border: #e8e8e8;
+      --success: #2d8a5f;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-alt);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .hidden-element {
+      display: none;
+    }
+
+    /* Header (Matching index.html) */
+    .site-header {
+      background: var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .logo:hover {
+      color: var(--accent);
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .main-nav a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .main-nav a:hover,
+    .main-nav a.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .cart-btn {
+      position: relative;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    .cart-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      min-width: 18px;
+      height: 18px;
+      background: var(--accent);
+      color: var(--primary);
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-dropdown {
+      position: relative;
+    }
+
+    .user-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .user-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .user-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.2s;
+      z-index: 100;
+      overflow: hidden;
+    }
+
+    .user-dropdown.open .user-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .user-menu-header {
+      padding: 16px;
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .user-menu-header strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .user-menu-header small {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .user-menu a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      transition: background 0.15s;
+    }
+
+    .user-menu a:hover {
+      background: var(--bg-alt);
+    }
+
+    .user-menu a i {
+      width: 16px;
+      color: var(--text-muted);
+    }
+
+    .user-menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+
+    .user-menu a.logout {
+      color: #dc3545;
+    }
+
+    .user-menu a.logout i {
+      color: #dc3545;
+    }
+
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* Detail Layout */
+    .page-header {
+      padding: 60px 0;
+      text-align: center;
+      background: var(--primary);
+    }
+
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .page-header p {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 15px;
+    }
+
+    .main-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .order-detail-card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 40px;
+      margin-bottom: 30px;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .order-id {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .order-date {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .status-badge {
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status-entregado {
+      background: #f0fff4;
+      color: #2d8a5f;
+      border: 1px solid #c6f6d5;
+    }
+
+    .status-pendiente {
+      background: #fffcf0;
+      color: #b38600;
+      border: 1px solid #ffeeba;
+    }
+
+    .items-list {
+      margin-bottom: 40px;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .item-row:last-child {
+      border-bottom: none;
+    }
+
+    .item-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .item-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 16px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .shipping-info h4 {
+      font-family: 'Playfair Display', serif;
+      color: var(--primary);
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+    }
+
+    .shipping-info p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .totals-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .totals-table td {
+      padding: 12px 0;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .totals-table td:last-child {
+      text-align: right;
+      color: var(--primary);
+    }
+
+    .totals-table .grand-total {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .totals-table .grand-total td:last-child {
+      color: var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .btn-premium {
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-premium:hover {
+      background: var(--accent);
+      color: var(--primary);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Footer (Matching index.html) */
+    footer {
+      background: var(--primary);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 80px 0 40px;
+      margin-top: 100px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      max-width: 1400px;
+      margin: 0 auto 60px;
+      padding: 0 40px;
+    }
+
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .footer-col h5 {
+      color: #fff;
+      margin-bottom: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .footer-col p,
+    .footer-col li {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-col a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+    }
+
+    .footer-col a:hover {
+      color: var(--accent);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 1400px;
+      margin: 0 auto;
+      padding-left: 40px;
+      padding-right: 40px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 992px) {
+      .header-container {
+        padding: 0 20px;
+      }
+
+      .mobile-toggle {
+        display: block;
+      }
+
+      .main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--primary);
+        flex-direction: column;
+        padding: 16px;
+      }
+
+      .main-nav.show {
+        display: flex;
+      }
+
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+        padding: 0 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .order-detail-card {
+        padding: 20px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+<script src="../assets/js/config.js"></script>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <a href="index.html" class="logo">PLASISE</a>
+      <button class="mobile-toggle" onclick="document.querySelector('.main-nav').classList.toggle('show')">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav class="main-nav">
+        <a href="index.html">Inicio</a>
+        <a href="productos.html">Productos</a>
+        <a href="servicios.html">Servicios</a>
+        <a href="contacto.html">Contacto</a>
+      </nav>
+      <div class="header-actions">
+        <a href="carrito.html" class="cart-btn" id="cartBtn">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge" id="cartCount">0</span>
+        </a>
+        <div class="user-dropdown" id="userDropdown">
+          <button class="user-btn" onclick="toggleUserMenu()">
+            <i class="fas fa-user-circle"></i>
+            <span id="userName">Mi Cuenta</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="user-menu">
+            <div class="user-menu-header">
+              <strong id="userFullName">-</strong>
+              <small id="userEmail">-</small>
+            </div>
+            <a href="admin/index.html" id="adminLink" class="hidden-element"><i class="fas fa-tachometer-alt"></i>
+              Dashboard Admin</a>
+            <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
+            <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
+            <a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Direcciones</a>
+            <div class="user-menu-divider"></div>
+            <a href="#" class="logout" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Cerrar
+              Sesión</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="app">
+    <section class="page-header">
+      <h1>Detalle del Pedido</h1>
+      <p>Resumen detallado de tu transacción profesional</p>
+    </section>
+
+    <div class="main-content">
+      <div id="loader" class="text-center p-5">
+        <div class="spinner-border text-gold" role="status"></div>
+        <p class="mt-3">Cargando información del pedido...</p>
+      </div>
+
+      <div id="orderContent" class="hidden-element">
+        <div class="order-detail-card">
+          <div class="detail-header">
+            <div>
+              <div class="order-id" id="displayId">Pedido #---</div>
+              <div class="order-date" id="displayDate">-- de --- de ----</div>
+            </div>
+            <div id="displayStatus" class="status-badge">---</div>
+          </div>
+
+          <div class="items-list" id="itemsList">
+            <!-- Items will be injected here -->
+          </div>
+
+          <div class="summary-grid">
+            <div class="shipping-info">
+              <h4>Dirección de Envío</h4>
+              <p id="shipName">--</p>
+              <p id="shipAddress">--</p>
+              <p id="shipCity">--</p>
+              <p id="shipCountry">--</p>
+
+              <h4 class="mt-4">Método de Pago</h4>
+              <p id="paymentMethod">Transferencia Bancaria</p>
+            </div>
+            <div class="totals-section">
+              <table class="totals-table">
+                <tr>
+                  <td>Subtotal</td>
+                  <td id="subtotal">0,00 €</td>
+                </tr>
+                <tr>
+                  <td>Envío</td>
+                  <td id="shipping">Gratis</td>
+                </tr>
+                <tr class="grand-total">
+                  <td>Total (IVA incl.)</td>
+                  <td id="grandTotal">0,00 €</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button onclick="window.print()" class="btn-outline"><i class="fas fa-print"></i> Imprimir Recibo</button>
+          <a href="contacto.html" class="btn-premium"><i class="fas fa-headset"></i> Soporte Post-Venta</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+      <p class="mb-2">&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+      <div class="legal-links small">
+        <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a> | 
+        <a href="legales/politica-privacidad.html" class="text-white-50 text-decoration-none mx-2">Privacidad</a> | 
+        <a href="legales/politica-cookies.html" class="text-white-50 text-decoration-none mx-2">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+
+    function toggleUserMenu() {
+      document.getElementById('userDropdown').classList.toggle('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
+      }
+    });
+
+    async function checkAuth() {
+      try {
+        const r = await fetch(API + '/auth/session', { credentials: 'include' });
+        const d = await r.json();
+
+        if (!d.authenticated) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        document.getElementById('userDropdown').classList.add('show');
+        document.getElementById('userName').textContent = d.user.nombre;
+        document.getElementById('userFullName').textContent = d.user.nombre + ' ' + (d.user.apellidos || '');
+        document.getElementById('userEmail').textContent = d.user.email || '';
+        document.getElementById('cartBtn').classList.add('show');
+      } catch (e) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    async function logout() {
+      await fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' });
+      window.location.reload();
+    }
+
+    function formatPrice(p) {
+      return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(p || 0);
+    }
+
+    async function cancelarPedido(id) {
+      if (!confirm('¿Estás seguro de que deseas cancelar este pedido?')) return;
+
+      try {
+        const r = await fetch(`${API}/orders/${id}/cancel`, {
+          method: 'PUT',
+          credentials: 'include'
+        });
+
+        if (r.ok) {
+          alert('Pedido cancelado correctamente.');
+          window.location.reload();
+        } else {
+          const data = await r.json();
+          alert(data.error || 'Error al cancelar el pedido.');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Error de conexión al cancelar el pedido.');
+      }
+    }
+
+    async function loadOrderDetail() {
+      // Primero verificar auth
+      await checkAuth();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('id');
+
+      if (!orderId) {
+        window.location.href = 'pedidos.html';
+        return;
+      }
+
+      try {
+        const r = await fetch(`${API}/user/orders/${orderId}`, { credentials: 'include' });
+        if (!r.ok) throw new Error('Order not found');
+        const data = await r.json();
+
+        if (!data.success || !data.order) {
+          throw new Error('Formato de orden inválido');
+        }
+
+        const o = data.order;
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('orderContent').style.display = 'block';
+
+        // Basic Info
+        document.getElementById('displayId').textContent = 'Pedido #' + o.id;
+        document.getElementById('displayDate').textContent = new Date(o.fecha_pedido || o.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        const statusEl = document.getElementById('displayStatus');
+        statusEl.textContent = o.estado || 'Pendiente';
+        statusEl.className = 'status-badge status-' + (o.estado || 'pendiente').toLowerCase();
+
+        // Items
+        const list = document.getElementById('itemsList');
+        list.innerHTML = (o.items || []).map(item => `
+                    <div class="item-row">
+                        <img src="${item.imagen || '/assets/img/placeholder.png'}" class="item-img" onerror="this.src='https://via.placeholder.com/80?text=Prod'">
+                        <div class="item-info">
+                            <div class="item-name">${item.nombre}</div>
+                            <div class="item-meta">Cantidad: ${item.cantidad} | SKU: ${item.sku || '-'}</div>
+                        </div>
+                        <div class="item-price">${formatPrice((item.precio_unitario || item.precio) * item.cantidad)}</div>
+                    </div>
+                `).join('');
+
+        // Totals
+        document.getElementById('subtotal').textContent = formatPrice(o.subtotal || o.total);
+        document.getElementById('grandTotal').textContent = formatPrice(o.total);
+
+        // Shipping (Mock data if not available in API yet)
+        document.getElementById('shipName').textContent = 'Cliente Profesional';
+        document.getElementById('shipAddress').textContent = o.direccion_envio || 'Consultar con administración';
+        document.getElementById('shipCity').textContent = '';
+        document.getElementById('shipCountry').textContent = 'España';
+        document.getElementById('paymentMethod').textContent = o.metodo_pago ? o.metodo_pago.replace('_', ' ').toUpperCase() : 'Transferencia Bancaria';
+
+        // Actions
+        const actionsContainer = document.querySelector('.actions');
+        let actionsHtml = `<button onclick="window.print()" class="btn-outline"><i class="fas fa-print"></i> Imprimir Recibo</button>
+                           <a href="contacto.html" class="btn-premium"><i class="fas fa-headset"></i> Soporte Post-Venta</a>
+                           <button class="btn-outline" onclick="window.location.href='productos.html'"><i class="fas fa-redo"></i> Volver a Pedir</button>`;
+
+        if (o.estado === 'pendiente' || o.estado === 'carrito') {
+          actionsHtml += `<button onclick="cancelarPedido(${o.id})" class="btn-outline" style="border-color: #dc3545; color: #dc3545; background-color: #fff5f5;"><i class="fas fa-times-circle"></i> Cancelar Pedido</button>`;
+        }
+        actionsContainer.innerHTML = actionsHtml;
+        if (actionsContainer) {
+          actionsContainer.innerHTML = actionsHtml;
+        }
+
+      } catch (e) {
+        console.error(e);
+        document.getElementById('loader').innerHTML = '<div class="alert alert-danger">No se pudo cargar la información del pedido.</div>';
+      }
+    }
+
+    async function cancelarPedido(id) {
+      if (!confirm('¿Estás seguro de que deseas cancelar este pedido? Esta acción no se puede deshacer.')) return;
+
+      try {
+        const r = await fetch(`${API}/orders/${id}/cancel`, {
+          method: 'PUT',
+          credentials: 'include'
+        });
+        const d = await r.json();
+
+        if (d.success) {
+          alert('Pedido cancelado correctamente.');
+          window.location.reload();
+        } else {
+          alert(d.error || 'Error al cancelar el pedido');
+        }
+      } catch (e) {
+        alert('Error de conexión.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadOrderDetail);
+  </script>
+  <!-- Cookies Banner -->
+  <link rel="stylesheet" href="../assets/css/cookies.css">
+  <script src="../assets/js/cookies.js"></script>
+</body>
+
+</html>

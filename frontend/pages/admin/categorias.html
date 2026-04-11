@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Categorías - PLASISE Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --sidebar-bg: #0a0a0f; --sidebar-hover: #16161d; --accent: #c8a45e; --text-light: #a0a0a0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafafa; }
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--sidebar-bg); color: #fff; z-index: 100; }
+    .sidebar-brand { padding: 20px; font-size: 24px; font-family: 'Playfair Display', serif; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-brand span { color: var(--accent); }
+    .sidebar-nav { padding: 20px 0; }
+    .nav-section { padding: 10px 20px; font-size: 11px; text-transform: uppercase; color: var(--text-light); letter-spacing: 1px; }
+    .nav-item { display: flex; align-items: center; padding: 12px 20px; color: #fff; text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent; }
+    .nav-item:hover { background: var(--sidebar-hover); color: var(--accent); }
+    .nav-item.active { background: var(--sidebar-hover); border-left-color: var(--accent); color: var(--accent); }
+    .nav-item i { width: 24px; margin-right: 12px; }
+    .main { margin-left: 260px; min-height: 100vh; }
+    .topbar { background: #fff; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .topbar-title { font-size: 20px; font-family: 'Playfair Display', serif; font-weight: 600; }
+    .content { padding: 30px; }
+    .card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .card-header { background: #fff; border-bottom: 1px solid #eee; padding: 16px 20px; font-weight: 600; }
+    .table th { background: #f8f9fa; font-weight: 600; font-size: 11px; text-transform: uppercase; color: #666; }
+    .table td { vertical-align: middle; }
+    .btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-accent:hover { background: #b8944e; border-color: #b8944e; color: #fff; }
+    .modal-header { background: var(--sidebar-bg); color: #fff; }
+    .modal-header .btn-close { filter: invert(1); }
+    .cat-level-0 { font-weight: 700; background: #f8f9fa; }
+    .cat-level-1 { padding-left: 30px !important; }
+    .cat-level-2 { padding-left: 60px !important; color: #666; }
+    .badge-count { background: #e3f2fd; color: #1976d2; padding: 4px 10px; border-radius: 12px; font-size: 11px; }
+    @media (max-width: 992px) { .sidebar { display: none; } .main { margin-left: 0; } }
+  </style>
+<script src="../../assets/js/config.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><i class="fas fa-shield-alt me-2"></i>PLASI<span>SE</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="index.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      <div class="nav-section">Catálogo</div>
+      <a href="productos.html" class="nav-item"><i class="fas fa-boxes"></i> Productos</a>
+      <a href="categorias.html" class="nav-item active"><i class="fas fa-folder-tree"></i> Categorías</a>
+      <a href="marcas.html" class="nav-item"><i class="fas fa-tags"></i> Marcas</a>
+      <div class="nav-section">Ventas</div>
+      <a href="pedidos.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+      <div class="nav-section">Usuarios</div>
+      <a href="usuarios.html" class="nav-item"><i class="fas fa-users"></i> Usuarios</a>
+      <div class="nav-section">Sistema</div>
+      <a href="eventos.html" class="nav-item"><i class="fas fa-microchip"></i> Eventos Log</a>
+      <a href="notificaciones.html" class="nav-item"><i class="fas fa-bell"></i> Notificaciones</a>
+
+      <a href="../productos.html" class="nav-item"><i class="fas fa-external-link-alt"></i> Ver Tienda</a>
+      <a href="#" class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 class="topbar-title"><i class="fas fa-folder-tree me-2"></i>Gestión de Categorías</h1>
+      <button class="btn btn-accent" onclick="openModal()"><i class="fas fa-plus me-2"></i>Nueva Categoría</button>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Árbol de Categorías</span>
+          <span class="text-muted" id="totalCount">0 categorías</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Productos</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th style="width:120px">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="categoriesTable">
+              <tr><td colspan="5" class="text-center py-4"><div class="spinner-border"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal fade" id="catModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Nueva Categoría</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" title="Cerrar modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="catForm">
+            <input type="hidden" id="catId">
+            <div class="mb-3">
+              <label class="form-label" for="catNombre">Nombre *</label>
+              <input type="text" class="form-control" id="catNombre" required title="Nombre de la categoría">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="catParent">Categoría Padre</label>
+              <select class="form-select" id="catParent" title="Seleccionar categoría superior">
+                <option value="">— Ninguna (categoría principal) —</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="catDesc">Descripción</label>
+              <textarea class="form-control" id="catDesc" rows="2" title="Descripción de la categoría" placeholder="Breve descripción..."></textarea>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <label class="form-label" for="catOrden">Orden</label>
+                <input type="number" class="form-control" id="catOrden" value="0" title="Orden de visualización">
+              </div>
+              <div class="col-6">
+                <label class="form-label" for="catActivo">Estado</label>
+                <select class="form-select" id="catActivo" title="Estado de la categoría">
+                  <option value="1">Activa</option>
+                  <option value="0">Inactiva</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-accent" onclick="saveCategory()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+    let catModal;
+    let allCategories = [];
+
+    async function checkAuth() {
+      const r = await fetch(`${API}/auth/session`, { credentials: 'include' });
+      const d = await r.json();
+      if (!d.authenticated || (d.user.rol !== 'admin' && d.user.rol !== 'super_admin' && d.user.rol !== 'administrador')) {
+        window.location.href = '../login.html?redirect=admin';
+      }
+    }
+
+    async function loadCategories() {
+      const r = await fetch(`${API}/admin/categories`, { credentials: 'include' });
+      const d = await r.json();
+
+      if (d.success) {
+        allCategories = d.categories;
+        
+        // Organizar por niveles
+        const level0 = d.categories.filter(c => !c.parent_id);
+        const level1 = d.categories.filter(c => c.parent_id && level0.find(p => p.id === c.parent_id));
+        const level2 = d.categories.filter(c => c.parent_id && level1.find(p => p.id === c.parent_id));
+        
+        const tbody = document.getElementById('categoriesTable');
+        let html = '';
+        
+        level0.forEach(cat => {
+          html += renderCatRow(cat, 0);
+          level1.filter(c => c.parent_id === cat.id).forEach(sub => {
+            html += renderCatRow(sub, 1);
+            level2.filter(c => c.parent_id === sub.id).forEach(subsub => {
+              html += renderCatRow(subsub, 2);
+            });
+          });
+        });
+        
+        tbody.innerHTML = html || '<tr><td colspan="5" class="text-center py-4 text-muted">No hay categorías</td></tr>';
+        document.getElementById('totalCount').textContent = `${d.categories.length} categorías`;
+        
+        // Llenar select de padres
+        const parentSelect = document.getElementById('catParent');
+        parentSelect.innerHTML = '<option value="">— Ninguna (categoría principal) —</option>';
+        level0.forEach(c => {
+          parentSelect.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+          level1.filter(s => s.parent_id === c.id).forEach(s => {
+            parentSelect.innerHTML += `<option value="${s.id}">— ${s.nombre}</option>`;
+          });
+        });
+      }
+    }
+
+    function renderCatRow(cat, level) {
+      const prefix = level === 0 ? '' : (level === 1 ? '├── ' : '│   └── ');
+      return `
+        <tr class="cat-level-${level}">
+          <td>${prefix}<i class="fas fa-folder${level === 0 ? '' : '-open'} me-2 text-warning"></i>${cat.nombre}</td>
+          <td><span class="badge-count">${cat.productos_count || 0}</span></td>
+          <td>${cat.orden || 0}</td>
+          <td>${cat.activo ? '<span class="text-success">Activa</span>' : '<span class="text-danger">Inactiva</span>'}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${cat.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${cat.id})"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function openModal(cat = null) {
+      document.getElementById('catForm').reset();
+      document.getElementById('catId').value = '';
+      document.getElementById('modalTitle').textContent = cat ? 'Editar Categoría' : 'Nueva Categoría';
+      
+      if (cat) {
+        document.getElementById('catId').value = cat.id;
+        document.getElementById('catNombre').value = cat.nombre || '';
+        document.getElementById('catParent').value = cat.parent_id || '';
+        document.getElementById('catDesc').value = cat.descripcion || '';
+        document.getElementById('catOrden').value = cat.orden || 0;
+        document.getElementById('catActivo').value = cat.activo ? '1' : '0';
+      }
+      
+      catModal.show();
+    }
+
+    function editCategory(id) {
+      const cat = allCategories.find(c => c.id === id);
+      if (cat) openModal(cat);
+    }
+
+    async function saveCategory() {
+      const id = document.getElementById('catId').value;
+      const data = {
+        nombre: document.getElementById('catNombre').value,
+        parent_id: document.getElementById('catParent').value || null,
+        descripcion: document.getElementById('catDesc').value,
+        orden: parseInt(document.getElementById('catOrden').value) || 0,
+        activo: document.getElementById('catActivo').value === '1' ? 1 : 0
+      };
+
+      const url = id ? `${API}/admin/categories/${id}` : `${API}/admin/categories`;
+      const method = id ? 'PUT' : 'POST';
+
+      const r = await fetch(url, {
+        method, credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const d = await r.json();
+
+      if (d.success) {
+        catModal.hide();
+        loadCategories();
+        alert('Categoría guardada correctamente');
+      } else {
+        alert('Error: ' + (d.error || 'No se pudo guardar'));
+      }
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm('¿Eliminar esta categoría?')) return;
+      const r = await fetch(`${API}/admin/categories/${id}`, { method: 'DELETE', credentials: 'include' });
+      const d = await r.json();
+      if (d.success) loadCategories();
+      else alert('Error: ' + d.error);
+    }
+
+    async function logout() {
+      await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' });
+      window.location.href = '../login.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      catModal = new bootstrap.Modal(document.getElementById('catModal'));
+      await checkAuth();
+      await loadCategories();
+    });
+  </script>
+        <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+</html>

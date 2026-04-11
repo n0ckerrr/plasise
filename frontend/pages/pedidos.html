@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - PLASISE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a0a0f;
+            --primary-light: #16161d;
+            --accent: #c8a45e;
+            --accent-light: #d4b76a;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --text-light: #999;
+            --bg: #fff;
+            --bg-alt: #fafafa;
+            --border: #e8e8e8;
+            --success: #2d8a5f;
+            --warning: #b38600;
+            --danger: #b32d2d;
+        }
+
+        .logout-link { color: var(--danger) !important; }
+        .footer-inner-padding { padding: 0 40px; }
+        .footer-icon-accent { color: var(--accent); margin-right: 12px; }
+        .ts-badge-premium { 
+            background: rgba(200, 164, 94, 0.2); 
+            color: var(--accent); 
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 12px; 
+            display: inline-block; 
+        }
+
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--bg-alt);
+        }
+
+        /* Header (Matching index.html Premium) */
+        .site-header {
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            color: var(--accent);
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .main-nav a:hover,
+        .main-nav a.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .cart-btn {
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            align-items: center;
+        }
+
+        .cart-btn.show {
+            display: flex;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-btn {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 10px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            position: relative;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 240px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .user-dropdown.open .user-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            padding: 16px;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-menu-header strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 2px;
+            color: var(--primary);
+        }
+
+        .user-menu-header small {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .user-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .user-menu a:hover {
+            background: var(--bg-alt);
+            color: var(--primary);
+        }
+
+        .user-menu i {
+            width: 16px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0;
+        }
+
+        .user-menu a.logout {
+            color: var(--danger);
+        }
+
+        .user-menu a.logout i {
+            color: var(--danger);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--primary);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Layout */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 40px;
+        }
+
+        .account-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 60px;
+        }
+
+        /* Sidebar (Matching Perfil/Pedido) */
+        .account-sidebar {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 32px 24px;
+            height: fit-content;
+        }
+
+        .account-user {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .account-avatar {
+            width: 110px;
+            height: 110px;
+            background: var(--bg-alt);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 44px;
+            color: var(--accent);
+            border: 2px solid var(--border);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.02);
+        }
+
+        .account-user h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .account-user p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .account-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .account-nav li {
+            margin-bottom: 8px;
+        }
+
+        .account-nav a {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 15px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .account-nav a:hover {
+            background: var(--bg-alt);
+            color: var(--primary);
+        }
+
+        .account-nav a.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .account-nav a.active i {
+            color: var(--accent);
+        }
+
+        .account-nav a i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Order Cards */
+        .content-card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .content-card-header {
+            padding: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content-card-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .content-card-body {
+            padding: 40px;
+        }
+
+        .order-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .order-card:hover {
+            border-color: var(--accent);
+        }
+
+        .order-header {
+            padding: 24px 40px;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-info {
+            display: flex;
+            gap: 60px;
+        }
+
+        .order-info-item label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .order-info-item strong {
+            display: block;
+            font-size: 15px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .order-status {
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .status-pendiente {
+            background: #fffcf0;
+            color: #b38600;
+            border: 1px solid #ffeeba;
+        }
+
+        .status-entregado {
+            background: #f0fff4;
+            color: #2d8a5f;
+            border: 1px solid #c6f6d5;
+        }
+
+        .status-cancelado {
+            background: #fff5f5;
+            color: #b32d2d;
+            border: 1px solid #feb2b2;
+        }
+
+        .status-procesando {
+            background: #f0f7ff;
+            color: #0066cc;
+            border: 1px solid #bee3f8;
+        }
+
+        .status-enviado {
+            background: #e6fffa;
+            color: #1a7f71;
+            border: 1px solid #b2f5ea;
+        }
+
+        .order-items {
+            padding: 40px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            transition: transform 0.3s;
+        }
+
+        .order-item:hover .order-item-img {
+            transform: scale(1.05);
+        }
+
+        .order-item-details {
+            flex: 1;
+        }
+
+        .order-item-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .order-item-sku {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .order-footer {
+            padding: 32px 40px;
+            background: #fff;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-total {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .order-total span {
+            color: var(--accent);
+        }
+
+        .btn-premium {
+            padding: 14px 28px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-premium:hover {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 120px 40px;
+        }
+
+        .empty-state i {
+            font-size: 100px;
+            color: var(--border);
+            margin-bottom: 40px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            font-size: 17px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* tech Banner */
+        .tech-service-banner {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            border-radius: 8px;
+            padding: 48px;
+            margin-top: 60px;
+            border: 1px solid rgba(200, 164, 94, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-service-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(200, 164, 94, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .ts-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .ts-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--primary);
+            box-shadow: 0 15px 40px rgba(200, 164, 94, 0.4);
+            flex-shrink: 0;
+        }
+
+        .ts-text {
+            flex: 1;
+        }
+
+        .ts-text h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .ts-text h3 span {
+            color: var(--accent);
+        }
+
+        .ts-text p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            max-width: 650px;
+            line-height: 1.6;
+        }
+
+        .ts-whatsapp {
+            background: #25D366;
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .ts-whatsapp:hover {
+            opacity: 0.9;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            margin: 100px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer (Matching index.html) */
+        footer {
+            background: var(--primary);
+            color: rgba(255, 255, 255, 0.7);
+            padding: 80px 0 40px;
+            margin-top: 100px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        footer h5 {
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        footer ul li {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 40px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1200px) {
+            .account-layout {
+                grid-template-columns: 280px 1fr;
+                gap: 40px;
+            }
+
+            .order-info {
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .account-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                padding: 0 30px;
+                height: 80px;
+            }
+
+            .main-nav {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .main-content {
+                padding: 40px 30px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 50px;
+            }
+
+            .page-header h1 {
+                font-size: 2.8rem;
+            }
+
+            .ts-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .ts-text p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .order-info {
+                flex-wrap: wrap;
+                gap: 20px 40px;
+            }
+
+            .order-footer {
+                flex-direction: column;
+                gap: 24px;
+                text-align: center;
+            }
+
+            .order-item {
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 60px;
+                text-align: center;
+            }
+
+            footer a:hover {
+                transform: translateY(-3px);
+            }
+        }
+    </style>
+<script src="../assets/js/config.js"></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">PLASISE</a>
+            <nav class="main-nav">
+                <a href="index.html">Inicio</a>
+                <a href="productos.html">Productos</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+            <div class="header-actions">
+                <a href="carrito.html" class="cart-btn" id="cartBtn">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName">Mi Cuenta</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-menu-header">
+                            <strong id="userFullName">-</strong>
+                            <small id="userEmail">-</small>
+                        </div>
+                        <a href="/admin/index.html" id="adminLink" style="display: none;"><i
+                                class="fas fa-tachometer-alt"></i> Dashboard Admin</a>
+                        <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
+                        <a href="pedidos.html" class="active"><i class="fas fa-box"></i> Mis Pedidos</a>
+                        <a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Direcciones</a>
+                        <div class="user-menu-divider"></div>
+                        <a href="#" class="logout" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesión</a>
+                    </div>
+                </div>
+                <button class="mobile-toggle d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <h1>Mis Pedidos</h1>
+        <p>Historial y seguimiento de tus adquisiciones tecnológicas profesionales en PLASISE</p>
+    </section>
+
+    <main class="main-content">
+        <div class="account-layout">
+            <aside class="account-sidebar">
+                <div class="account-user">
+                    <div class="account-avatar"><i class="fas fa-user"></i></div>
+                    <h3 id="sidebarName">-</h3>
+                    <p id="sidebarEmail">-</p>
+                </div>
+                <ul class="account-nav">
+                    <li><a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a></li>
+                    <li><a href="pedidos.html" class="active"><i class="fas fa-box"></i> Mis Pedidos</a></li>
+                    <li><a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Direcciones</a></li>
+                    <li><a href="#" class="logout logout-link" onclick="logout(); return false;"><i
+                                class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                </ul>
+            </aside>
+
+            <div class="content-area">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h2>Historial de Adquisiciones</h2>
+                    </div>
+                    <div class="content-card-body" id="ordersContainer">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+
+                <!-- Technical Service Banner -->
+                <div class="tech-service-banner d-none" id="techBanner">
+                    <div class="ts-content">
+                        <div class="ts-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="ts-text">
+                            <span class="ts-badge-premium">Beneficio
+                                Cliente VIP</span>
+                            <h3>Servicio Técnico <span>ESPECIALIZADO</span></h3>
+                            <p>Como cliente registrado de PLASISE, cuentas con soporte técnico prioritario y gratuito
+                                para la configuración de todos tus equipos de seguridad.</p>
+                        </div>
+                        <a href="https://wa.me/34684782268?text=Hola,%20soy%20cliente%20VIP%20de%20PLASISE%20y%20necesito%20soporte%20con%20mi%20pedido"
+                            target="_blank" rel="noopener" class="ts-whatsapp">
+                            <i class="fab fa-whatsapp"></i> Contactar Soporte
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="main-content footer-inner-padding">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">PLASISE</div>
+                    <p>Líderes en distribución de soluciones de seguridad electrónica de alta gama para profesionales
+                        exigentes.</p>
+                </div>
+                <div>
+                    <h5>Ecosistema</h5>
+                    <ul>
+                        <li><a href="productos.html?cat=1">Video / CCTV</a></li>
+                        <li><a href="productos.html?cat=2">Control de Accesos</a></li>
+                        <li><a href="productos.html?cat=3">Intrusión</a></li>
+                        <li><a href="productos.html?cat=4">Detección de Incendios</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>Cuenta</h5>
+                    <ul>
+                        <li><a href="perfil.html">Mi Perfil</a></li>
+                        <li><a href="pedidos.html">Historial de Pedidos</a></li>
+                        <li><a href="carrito.html">Mi Cesta</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>Contacto Directo</h5>
+                    <ul>
+                        <li><i class="fas fa-phone footer-icon-accent"></i> +34 684 782
+                            268</li>
+                        <li><i class="fas fa-envelope footer-icon-accent"></i>
+                            info@plasise.com</li>
+                        <li><i class="fas fa-map-marker-alt footer-icon-accent"></i>
+                            Girona, España</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-2">&copy; 2026 PLASISE S.A. Excelencia en Seguridad Electrónica. Todos los derechos reservados.</p>
+                <div class="legal-links small">
+                    <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a> | 
+                    <a href="legales/politica-privacidad.html" class="text-white-50 text-decoration-none mx-2">Privacidad</a> | 
+                    <a href="legales/politica-cookies.html" class="text-white-50 text-decoration-none mx-2">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('open');
+        }
+
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        async function checkAuth() {
+            try {
+                const r = await fetch(API + '/auth/session', { credentials: 'include' });
+                const d = await r.json();
+
+                if (!d.authenticated) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                document.getElementById('userDropdown').classList.add('show');
+                document.getElementById('userName').textContent = d.user.nombre;
+                document.getElementById('userFullName').textContent = d.user.nombre + ' ' + (d.user.apellidos || '');
+                document.getElementById('userEmail').textContent = d.user.email || '';
+                document.getElementById('cartBtn').classList.add('show');
+
+                // Sidebar
+                document.getElementById('sidebarName').textContent = d.user.nombre + ' ' + (d.user.apellidos || '');
+                document.getElementById('sidebarEmail').textContent = d.user.email || '';
+
+                if (d.user.rol === 'admin' || d.user.rol === 'administrador') {
+                    const adminLink = document.getElementById('adminLink');
+                    if (adminLink) adminLink.style.display = 'flex';
+                }
+
+                loadOrders();
+                loadCart();
+            } catch (e) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        async function logout() {
+            await fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' });
+            window.location.reload();
+        }
+
+        async function loadCart() {
+            try {
+                const r = await fetch(API + '/cart', { credentials: 'include' });
+                const d = await r.json();
+                document.getElementById('cartCount').textContent = d.items_count || 0;
+            } catch (e) { }
+        }
+
+        function formatPrice(p) {
+            return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(p || 0);
+        }
+
+        function formatDate(d) {
+            if (!d) return '-';
+            return new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+        }
+
+        async function loadOrders() {
+            const container = document.getElementById('ordersContainer');
+
+            try {
+                const r = await fetch(API + '/orders', { credentials: 'include' });
+                const d = await r.json();
+
+                const orders = d.orders || d;
+
+                if (!orders || (Array.isArray(orders) && orders.length === 0)) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Sin historial de pedidos</h3>
+                        <p>Tu trayectoria con nosotros comienza hoy. Explora nuestro catálogo premium y realiza tu primera adquisición.</p>
+                        <a href="productos.html" class="btn-premium">Explorar Catálogo</a>
+                    </div>
+                `;
+                    return;
+                }
+
+                let html = '';
+                orders.forEach(order => {
+                    const statusClass = 'status-' + (order.estado || 'pendiente').toLowerCase();
+                    const statusText = order.estado || 'Pendiente';
+
+                    let itemsHtml = '';
+                    if (order.items && order.items.length > 0) {
+                        itemsHtml = order.items.map(item => `
+                        <div class="order-item">
+                            <img src="${item.imagen_principal || '/assets/img/placeholder.png'}" class="order-item-img" onerror="this.src='https://via.placeholder.com/90?text=Premium+Security'">
+                            <div class="order-item-details">
+                                <div class="order-item-name">${item.nombre || 'Equipo de Seguridad'}</div>
+                                <div class="order-item-sku">SKU: ${item.sku || '-'} | Unidades: ${item.cantidad || 1}</div>
+                            </div>
+                            <div style="font-weight: 700; color: var(--primary); font-size: 16px;">${formatPrice((item.precio_unitario || item.precio || 0) * (item.cantidad || 1))}</div>
+                        </div>
+                    `).join('');
+                    } else {
+                        itemsHtml = '<div class="text-muted p-3"><em>Incompatibilidad en formato de items o pedido sin items.</em></div>';
+                    }
+
+                    html += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <div class="order-info-item">
+                                    <label>Identificador</label>
+                                    <strong>#${order.id}</strong>
+                                </div>
+                                <div class="order-info-item">
+                                    <label>Fecha de Emisión</label>
+                                    <strong>${formatDate(order.fecha_creacion || order.fecha)}</strong>
+                                </div>
+                                <div class="order-info-item">
+                                    <label>Estado del Envío</label>
+                                    <span class="order-status ${statusClass}">${statusText}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-items">${itemsHtml}</div>
+                        <div class="order-footer">
+                            <div class="order-total">Total Adquisición: <span>${formatPrice(order.total || 0)}</span></div>
+                            <a href="pedido.html?id=${order.id}" class="btn-premium">Ver Detalles del Pedido <i class="fas fa-chevron-right"></i></a>
+                        </div>
+                    </div>
+                `;
+                });
+
+                container.innerHTML = html;
+                const techBanner = document.getElementById('techBanner');
+                if (techBanner) techBanner.style.display = 'block';
+
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div class="text-center p-5">Incapacidad temporal para recuperar el historial de pedidos</div>';
+            }
+        }
+
+        checkAuth();
+    </script>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-2">&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+            <div class="legal-links small">
+                <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a> | 
+                <a href="legales/politica-privacidad.html" class="text-white-50 text-decoration-none mx-2">Privacidad</a> | 
+                <a href="legales/politica-cookies.html" class="text-white-50 text-decoration-none mx-2">Cookies</a>
+            </div>
+        </div>
+    </footer>
+        <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+
+</html>

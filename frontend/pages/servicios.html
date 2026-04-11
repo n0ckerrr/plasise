@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios de Automatización IA - PLASISE / Pla6è Solucions</title>
+    <meta name="description" content="Automatizamos los procesos de tu empresa con IA: Chatbots, Agentes IA, Dashboards, RAG y más. Soluciones personalizadas para negocios B2B.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        :root {
+            --primary: #0a0a0f;
+            --primary-light: #16161d;
+            --accent: #c8a45e;
+            --accent-light: #d4b76a;
+            --accent-glow: rgba(200, 164, 94, 0.15);
+            --text: #1a1a1a;
+            --text-muted: #888;
+            --text-light: #bbb;
+            --bg: #fff;
+            --bg-alt: #fafafa;
+            --border: #e8e8e8;
+            --dark-surface: #111118;
+            --dark-card: #1a1a24;
+            --dark-border: rgba(200, 164, 94, 0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            overflow-x: hidden;
+        }
+
+        /* ============ HEADER ============ */
+        .site-header {
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .logo:hover { color: var(--accent); }
+
+        .main-nav { display: flex; align-items: center; gap: 8px; }
+
+        .main-nav a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .main-nav a:hover, .main-nav a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .main-nav a.active { color: var(--accent); }
+
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+
+        .login-btn {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 9px 22px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        /* ============ HERO ============ */
+        .services-hero {
+            background: var(--primary);
+            padding: 100px 40px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .services-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,164,94,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .services-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-glow);
+            border: 1px solid var(--dark-border);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 18px;
+            border-radius: 50px;
+            margin-bottom: 28px;
+        }
+
+        .hero-badge i { font-size: 10px; }
+
+        .services-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .services-hero h1 span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .services-hero p {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.6);
+            max-width: 580px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            padding: 14px 32px;
+            border-radius: 4px;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .hero-cta:hover {
+            background: var(--accent-light);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(200,164,94,0.3);
+        }
+
+        /* ============ STATS BAR ============ */
+        .stats-bar {
+            background: var(--dark-surface);
+            border-top: 1px solid var(--dark-border);
+            border-bottom: 1px solid var(--dark-border);
+            padding: 28px 40px;
+        }
+
+        .stats-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+        }
+
+        .stat-item .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: block;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-item .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* ============ SERVICES SECTION ============ */
+        .section { padding: 90px 40px; }
+        .section-alt { background: var(--bg-alt); }
+        .section-dark { background: var(--primary); }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .section-dark .section-header h2 { color: #fff; }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .section-dark .section-header p { color: rgba(255,255,255,0.5); }
+
+        /* ============ SERVICE CARDS ============ */
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+
+        .service-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 36px 28px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-color: transparent;
+        }
+
+        .service-card:hover::before { transform: scaleX(1); }
+
+        .service-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(200,164,94,0.1);
+            border: 1px solid rgba(200,164,94,0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--accent);
+            margin-bottom: 22px;
+            transition: all 0.3s;
+        }
+
+        .service-card:hover .service-icon {
+            background: var(--accent);
+            color: var(--primary);
+            border-color: var(--accent);
+        }
+
+        .service-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .service-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .service-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .service-features li {
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-features li::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ============ DARK SERVICE CARDS ============ */
+        .services-grid-dark .service-card {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+        }
+
+        .services-grid-dark .service-card h3 { color: #fff; }
+        .services-grid-dark .service-card p { color: rgba(255,255,255,0.5); }
+        .services-grid-dark .service-features li { color: rgba(255,255,255,0.5); }
+
+        /* ============ PROCESS SECTION ============ */
+        .process-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            position: relative;
+        }
+
+        .process-grid::before {
+            content: '';
+            position: absolute;
+            top: 36px;
+            left: calc(16.6% + 28px);
+            right: calc(16.6% + 28px);
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light), var(--accent));
+            z-index: 0;
+        }
+
+        .process-step {
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 72px;
+            height: 72px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            box-shadow: 0 0 30px rgba(200,164,94,0.4);
+        }
+
+        .process-step h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .process-step p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.6;
+        }
+
+        /* ============ BENEFITS ============ */
+        .benefits-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .benefits-list { list-style: none; padding: 0; }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .benefit-item:last-child { border-bottom: none; }
+
+        .benefit-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(200,164,94,0.08);
+            border: 1px solid rgba(200,164,94,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .benefit-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .benefit-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .metrics-panel {
+            background: var(--primary);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid var(--dark-border);
+        }
+
+        .metrics-panel h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 28px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .metric-row:last-child { border-bottom: none; }
+
+        .metric-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .metric-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .metric-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 4px;
+        }
+
+        /* ============ COMPLIANCE SECTION ============ */
+        .compliance-banner {
+            background: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 48px 60px;
+            text-align: center;
+        }
+
+        .compliance-banner .compliance-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .compliance-banner h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .compliance-banner p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .compliance-tags {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .compliance-tag {
+            background: var(--accent-glow);
+            border: 1px solid var(--dark-border);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            padding: 7px 16px;
+            border-radius: 50px;
+        }
+
+        /* ============ CTA SECTION ============ */
+        .cta-section {
+            background: var(--primary);
+            padding: 100px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(200,164,94,0.1) 0%, transparent 70%);
+        }
+
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            color: #fff;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .cta-section p {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.55);
+            max-width: 520px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+            position: relative;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .btn-gold {
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            padding: 14px 32px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-gold:hover {
+            background: var(--accent-light);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(200,164,94,0.3);
+        }
+
+        .btn-outline-gold {
+            background: transparent;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 13px 32px;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-gold:hover {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        /* ============ CONTACT STRIP ============ */
+        .contact-strip {
+            background: #fff;
+            border-top: 1px solid var(--border);
+            padding: 32px 40px;
+        }
+
+        .contact-strip-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .contact-info { display: flex; gap: 32px; }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .contact-item i { color: var(--accent); }
+
+        .contact-item strong { color: var(--primary); }
+
+        /* ============ FOOTER ============ */
+        footer {
+            background: var(--primary);
+            padding: 32px 40px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-bottom p { font-size: 13px; color: rgba(255,255,255,0.4); margin: 0; }
+
+        .footer-legal a {
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            font-size: 12px;
+            margin-left: 20px;
+            transition: color 0.2s;
+        }
+
+        .footer-legal a:hover { color: var(--accent); }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 992px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .process-grid::before { display: none; }
+            .process-grid { grid-template-columns: 1fr; gap: 40px; }
+            .benefits-grid { grid-template-columns: 1fr; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .services-grid { grid-template-columns: 1fr; }
+            .section { padding: 60px 24px; }
+            .services-hero { padding: 70px 24px 60px; }
+            .header-container { padding: 0 20px; }
+            .main-nav { display: none; }
+            .mobile-toggle { display: block; }
+            .compliance-banner { padding: 36px 24px; }
+            .contact-info { flex-direction: column; gap: 12px; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* ============ ANIMATIONS ============ */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-up {
+            opacity: 0;
+            animation: fadeInUp 0.7s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+    </style>
+<script src="../assets/js/config.js"></script>
+</head>
+
+<body>
+    <!-- ========== HEADER ========== -->
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">PLASISE</a>
+            <button class="mobile-toggle" title="Abrir menú" onclick="document.querySelector('.main-nav').classList.toggle('show')">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <a href="index.html">Inicio</a>
+                <a href="productos.html">Productos</a>
+                <a href="servicios.html" class="active">Servicios</a>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+            <div class="header-actions">
+                <a href="login.html" class="login-btn" id="loginBtn">Acceder</a>
+                <!-- User Dropdown (shown when logged in) -->
+                <div class="user-dropdown" id="userDropdown" style="display:none">
+                    <button class="user-btn" title="Menú de usuario" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-menu-header">
+                            <strong id="userFullName"></strong>
+                            <small id="userEmail"></small>
+                        </div>
+                        <a href="admin/productos.html" id="adminLink" style="display: none;"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
+                        <a href="productos.html"><i class="fas fa-boxes"></i> Catálogo</a>
+                        <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
+                        <div class="user-menu-divider"></div>
+                        <a href="#" class="logout" onclick="logoutUser(); return false;"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== HERO ========== -->
+    <section class="services-hero">
+        <div class="hero-badge animate-fade-up">
+            <i class="fas fa-robot"></i>
+            Pla6è Solucions · Automatización Empresarial
+        </div>
+        <h1 class="animate-fade-up delay-1">
+            Automatizamos los trabajos<br>
+            tediosos para que puedas<br>
+            <span>ganar tiempo</span>
+        </h1>
+        <p class="animate-fade-up delay-2">
+            Soluciones de inteligencia artificial y automatización personalizadas 
+            para empresas B2B que quieren crecer sin aumentar su carga de trabajo.
+        </p>
+        <a href="#contacto" class="hero-cta animate-fade-up delay-3">
+            <i class="fas fa-arrow-right"></i>
+            Solicitar demostración gratuita
+        </a>
+    </section>
+
+    <!-- ========== STATS BAR ========== -->
+    <div class="stats-bar">
+        <div class="stats-inner">
+            <div class="stat-item">
+                <span class="stat-value">+30%</span>
+                <span class="stat-label">Aumento de conversión</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">24/7</span>
+                <span class="stat-label">Disponibilidad total</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">5–10'</span>
+                <span class="stat-label">Ahorrado por tarea</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">100%</span>
+                <span class="stat-label">Reducción leads perdidos</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SERVICIOS ========== -->
+    <section class="section section-alt" id="servicios">
+        <div class="container-fluid px-0">
+            <div class="section-header">
+                <span class="section-label">Nuestras Soluciones</span>
+                <h2>Tecnología IA para cada necesidad</h2>
+                <p>Gracias a estas automatizaciones y agentes IA podemos hacerte el trabajo más fácil, rápido y disponible las 24 horas.</p>
+            </div>
+
+            <div class="services-grid" style="padding: 0 40px; max-width: 1280px; margin: 0 auto;">
+                <!-- Card 1 -->
+                <div class="service-card animate-fade-up delay-1">
+                    <div class="service-icon"><i class="fas fa-comment-dots"></i></div>
+                    <h3>ChatBot IA</h3>
+                    <p>Atención al cliente automatizada e inteligente disponible los 7 días de la semana. Responde consultas, guía usuarios y captura leads sin intervención humana.</p>
+                    <ul class="service-features">
+                        <li>Respuesta inmediata 24/7</li>
+                        <li>Integración con WhatsApp, web y más</li>
+                        <li>Entrenado con tu base de conocimiento</li>
+                        <li>Escalado a agente humano si necesario</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="service-card animate-fade-up delay-2">
+                    <div class="service-icon"><i class="fas fa-microchip"></i></div>
+                    <h3>Agente IA</h3>
+                    <p>Un agente autónomo que analiza, toma decisiones y ejecuta tareas complejas. Ideal para clasificar correos, gestionar solicitudes y automatizar flujos de trabajo.</p>
+                    <ul class="service-features">
+                        <li>Clasificación automática de emails</li>
+                        <li>Priorización inteligente de tareas</li>
+                        <li>Integración con tus sistemas actuales</li>
+                        <li>Auditoría y trazabilidad completa</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="service-card animate-fade-up delay-3">
+                    <div class="service-icon"><i class="fas fa-network-wired"></i></div>
+                    <h3>Sistema Multiagente IA</h3>
+                    <p>Varios agentes especializados que trabajan en equipo. Cada uno gestiona una parte del proceso, maximizando la eficiencia y calidad del resultado final.</p>
+                    <ul class="service-features">
+                        <li>Agentes especializados por tarea</li>
+                        <li>Coordinación autónoma entre agentes</li>
+                        <li>Procesos paralelos y más velocidad</li>
+                        <li>Ideal para flujos complejos de empresa</li>
+                    </ul>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="service-card animate-fade-up delay-1">
+                    <div class="service-icon"><i class="fas fa-brain"></i></div>
+                    <h3>Arquitectura RAG</h3>
+                    <p>Retrieval-Augmented Generation: conecta la IA a tu base de datos documental para respuestas precisas basadas en tu información real y actualizada.</p>
+                    <ul class="service-features">
+                        <li>Búsqueda semántica en tus documentos</li>
+                        <li>Respuestas contextuales y precisas</li>
+                        <li>Integración con PDFs, webs, CRM</li>
+                        <li>Actualización automática del conocimiento</li>
+                    </ul>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="service-card animate-fade-up delay-2">
+                    <div class="service-icon"><i class="fas fa-database"></i></div>
+                    <h3>Bases de Datos Inteligentes</h3>
+                    <p>Organizamos y vectorizamos tu información empresarial para que la IA pueda consultarla, cruzarla y extraer valor de tus datos históricos y operativos.</p>
+                    <ul class="service-features">
+                        <li>Vectorización de datos no estructurados</li>
+                        <li>Consultas en lenguaje natural</li>
+                        <li>Análisis predictivo y tendencias</li>
+                        <li>Sincronización con tus fuentes actuales</li>
+                    </ul>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="service-card animate-fade-up delay-3">
+                    <div class="service-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Dashboards & Reporting</h3>
+                    <p>Paneles de control web y móvil en tiempo real para visualizar solicitudes, clientes, métricas y alertas. Toma decisiones basadas en datos actualizados.</p>
+                    <ul class="service-features">
+                        <li>Visualización en tiempo real</li>
+                        <li>Acceso desde web y app móvil</li>
+                        <li>Alertas automáticas configurables</li>
+                        <li>Exportación de informes en PDF/Excel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PROCESO ========== -->
+    <section class="section section-dark" id="proceso">
+        <div class="container-fluid px-0">
+            <div class="section-header">
+                <span class="section-label">Metodología</span>
+                <h2 style="color: #fff;">Proceso de automatización</h2>
+                <p>Un flujo claro y transparente desde el primer día hasta la puesta en marcha.</p>
+            </div>
+
+            <div class="process-grid">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3>Recibir datos</h3>
+                    <p>El workflow recibe los datos de tu empresa: correos, formularios, documentos o eventos de tu sistema.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3>Ejecución del proceso</h3>
+                    <p>El agente IA analiza, clasifica y ejecuta la lógica de negocio definida específicamente para tu empresa.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3>Reporte final</h3>
+                    <p>Recibes un informe con los resultados, métricas y alertas en tu panel de control o por email/WhatsApp.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== BENEFICIOS ========== -->
+    <section class="section" id="beneficios">
+        <div class="benefits-grid px-0" style="padding: 0 40px; max-width: 1200px; margin: 0 auto;">
+            <div>
+                <span class="section-label">Resultados reales</span>
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: var(--primary); margin-bottom: 32px; line-height: 1.3;">
+                    Lo que ganas automatizando con nosotros
+                </h2>
+                <ul class="benefits-list">
+                    <li class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-layer-group"></i></div>
+                        <div>
+                            <div class="benefit-title">Más organización</div>
+                            <div class="benefit-text">Toda la información clasificada automáticamente. Sin bandejas de entrada saturadas.</div>
+                        </div>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-bolt"></i></div>
+                        <div>
+                            <div class="benefit-title">Respuestas rápidas</div>
+                            <div class="benefit-text">Respuesta garantizada en menos de 24 horas para cualquier solicitud entrante.</div>
+                        </div>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-users"></i></div>
+                        <div>
+                            <div class="benefit-title">Mejor atención al cliente</div>
+                            <div class="benefit-text">Experiencia personalizada y consistente en cada interacción con tu marca.</div>
+                        </div>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-trending-up"></i></div>
+                        <div>
+                            <div class="benefit-title">Más ventas, más conversión</div>
+                            <div class="benefit-text">Aumento estimado de conversión del +30% al no perder ningún lead.</div>
+                        </div>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <div class="benefit-title">Tiempo ahorrado</div>
+                            <div class="benefit-text">5–10 minutos ahorrados por tarea. Multiplicado por cada proceso, es enorme.</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="metrics-panel">
+                <h3>Métricas clave de impacto</h3>
+
+                <div class="metric-row">
+                    <div>
+                        <div class="metric-label">Reducción de leads perdidos</div>
+                        <div class="metric-bar-wrap"><div class="metric-bar" style="width: 100%;"></div></div>
+                    </div>
+                    <div class="metric-value">≈ 100%</div>
+                </div>
+
+                <div class="metric-row">
+                    <div>
+                        <div class="metric-label">Aumento de conversión estimado</div>
+                        <div class="metric-bar-wrap"><div class="metric-bar" style="width: 30%;"></div></div>
+                    </div>
+                    <div class="metric-value">+30%</div>
+                </div>
+
+                <div class="metric-row">
+                    <div>
+                        <div class="metric-label">Escalabilidad (emails/día)</div>
+                        <div class="metric-bar-wrap"><div class="metric-bar" style="width: 80%;"></div></div>
+                    </div>
+                    <div class="metric-value">1000+</div>
+                </div>
+
+                <div class="metric-row">
+                    <div>
+                        <div class="metric-label">Disponibilidad del servicio</div>
+                        <div class="metric-bar-wrap"><div class="metric-bar" style="width: 99%;"></div></div>
+                    </div>
+                    <div class="metric-value">24/7</div>
+                </div>
+
+                <div class="metric-row">
+                    <div>
+                        <div class="metric-label">Tiempo ahorrado por tarea</div>
+                        <div class="metric-bar-wrap"><div class="metric-bar" style="width: 85%;"></div></div>
+                    </div>
+                    <div class="metric-value">5–10 min</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PRIVACIDAD ========== -->
+    <section class="section section-dark">
+        <div class="compliance-banner">
+            <div class="compliance-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3>Privacidad de datos garantizada</h3>
+            <p>Trabajamos exclusivamente con sistemas que cumplen la normativa europea de privacidad de datos RGPD. Tus datos y los de tus clientes están siempre protegidos.</p>
+            <div class="compliance-tags">
+                <span class="compliance-tag">RGPD / GDPR</span>
+                <span class="compliance-tag">ISO 27001</span>
+                <span class="compliance-tag">Datos en Europa</span>
+                <span class="compliance-tag">Sin retención de datos</span>
+                <span class="compliance-tag">Cifrado extremo a extremo</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CTA ========== -->
+    <section class="cta-section" id="contacto">
+        <h2>Hablemos de tu proyecto</h2>
+        <p>Esto es solo una demostración. Creamos soluciones de automatización personalizadas para cada empresa según sus necesidades específicas.</p>
+        <div class="cta-buttons">
+            <a href="https://wa.me/34633195403?text=Hola%20Ignasi,%20quiero%20saber%20más%20sobre%20vuestros%20servicios%20de%20automatización"
+               target="_blank" rel="noopener"
+               class="btn-gold">
+                <i class="fab fa-whatsapp me-2"></i>Contactar por WhatsApp
+            </a>
+            <a href="mailto:plasiserosas@outlook.com" class="btn-outline-gold">
+                <i class="fas fa-envelope me-2"></i>Enviar email
+            </a>
+        </div>
+    </section>
+
+    <!-- ========== CONTACT STRIP ========== -->
+    <div class="contact-strip">
+        <div class="contact-strip-inner">
+            <div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 4px;">Ignasi · Pla6è Solucions</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Automatización IA para empresas</div>
+            </div>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span><strong>plasiserosas@outlook.com</strong></span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span><strong>633 19 54 03</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+        <div class="footer-bottom">
+            <p>© 2026 PLASISE S.A. / Pla6è Solucions — Todos los derechos reservados.</p>
+            <div class="footer-legal">
+                <a href="legales/aviso-legal.html">Aviso Legal</a>
+                <a href="legales/politica-privacidad.html">Privacidad</a>
+                <a href="legales/politica-cookies.html">Cookies</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Fade in cards on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.service-card, .process-step, .benefit-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(24px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+
+    <!-- Auth Script -->
+    <script>
+        const API_BASE = window.location.pathname.startsWith('/plasise') 
+            ? window.location.origin + '/plasise' 
+            : window.location.origin;
+
+        function toggleUserMenu() {
+            const dd = document.getElementById('userDropdown');
+            if (dd) dd.classList.toggle('open');
+        }
+        document.addEventListener('click', (e) => {
+            const dd = document.getElementById('userDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
+
+        async function logoutUser() {
+            await fetch(API_BASE + '/api/v1/auth/logout', { method: 'POST', credentials: 'include' });
+            window.location.reload();
+        }
+
+        async function checkUserAuth() {
+            try {
+                const r = await fetch(API_BASE + '/api/v1/auth/session', { credentials: 'include' });
+                const d = await r.json();
+                if (d.authenticated) {
+                    const loginBtn = document.getElementById('loginBtn');
+                    if (loginBtn) loginBtn.style.display = 'none';
+
+                    const userDropdown = document.getElementById('userDropdown');
+                    if (userDropdown) userDropdown.style.display = 'flex';
+
+                    const userName = document.getElementById('userName');
+                    if (userName) userName.textContent = d.user.nombre;
+
+                    const userFullName = document.getElementById('userFullName');
+                    if (userFullName) userFullName.textContent = (d.user.nombre || '') + ' ' + (d.user.apellidos || '');
+
+                    const userEmail = document.getElementById('userEmail');
+                    if (userEmail) userEmail.textContent = d.user.email || '';
+
+                    const adminRoles = ['admin', 'administrador', 'super_admin'];
+                    if (adminRoles.includes(d.user.rol)) {
+                        const adminLink = document.getElementById('adminLink');
+                        if (adminLink) {
+                            adminLink.style.display = 'flex';
+                            adminLink.classList.remove('d-none');
+                        }
+                    }
+                } else {
+                    const userDropdown = document.getElementById('userDropdown');
+                    if (userDropdown) userDropdown.style.display = 'none';
+                }
+            } catch(e) {
+                console.error('Auth check failed:', e);
+                const userDropdown = document.getElementById('userDropdown');
+                if (userDropdown) userDropdown.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkUserAuth);
+    </script>
+
+
+
+    <!-- Auth Script -->
+    <script>
+        const API_BASE_SVC = window.location.pathname.startsWith('/plasise') 
+            ? window.location.origin + '/plasise' 
+            : window.location.origin;
+
+        function toggleUserMenu() {
+            const dd = document.getElementById('userDropdown');
+            if (dd) dd.classList.toggle('open');
+        }
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('userDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
+        function logoutUser() {
+            fetch(API_BASE_SVC + '/api/v1/auth/logout', { method: 'POST', credentials: 'include' })
+                .then(function() { window.location.reload(); });
+        }
+        async function checkUserAuth() {
+            try {
+                const r = await fetch(API_BASE_SVC + '/api/v1/auth/session', { credentials: 'include' });
+                const d = await r.json();
+                if (d.authenticated) {
+                    var lb = document.getElementById('loginBtn');
+                    if (lb) lb.style.display = 'none';
+                    var ud = document.getElementById('userDropdown');
+                    if (ud) ud.style.display = 'flex';
+                    var un = document.getElementById('userName');
+                    if (un) un.textContent = d.user.nombre;
+                    var uf = document.getElementById('userFullName');
+                    if (uf) uf.textContent = (d.user.nombre || '') + ' ' + (d.user.apellidos || '');
+                    var ue = document.getElementById('userEmail');
+                    if (ue) ue.textContent = d.user.email || '';
+                    var adminRoles = ['admin', 'administrador', 'super_admin'];
+                    if (adminRoles.indexOf(d.user.rol) !== -1) {
+                        var al = document.getElementById('adminLink');
+                        if (al) { al.style.display = 'flex'; al.classList.remove('d-none'); }
+                    }
+                } else {
+                    var ud2 = document.getElementById('userDropdown');
+                    if (ud2) ud2.style.display = 'none';
+                }
+            } catch(err) {
+                console.error('Auth check failed:', err);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', checkUserAuth);
+    </script>
+</body>
+</html>

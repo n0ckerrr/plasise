@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda - PLASISE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0a0a0f;
+      --primary-light: #1a1a2e;
+      --accent: #c8a45e;
+      --accent-light: #d4b978;
+      --text: #333;
+      --text-light: #666;
+      --bg: #fff;
+      --bg-alt: #f8f9fa;
+      --border: #e5e5e5;
+    }
+
+    .st-banner-custom { display: none; }
+    .st-sidebar-padding { padding: 16px; }
+    .st-nowrap { white-space: nowrap; }
+
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* Header */
+        .site-header {
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            color: var(--accent);
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-nav>a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .main-nav>a:hover,
+        .main-nav>a.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .cart-btn {
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .cart-btn.show {
+            display: flex;
+        }
+
+        .cart-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-btn {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 10px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: var(--accent-light);
+        }
+
+        /* User Dropdown */
+        .user-dropdown {
+            position: relative;
+            display: none;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .user-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-btn i {
+            font-size: 16px;
+        }
+
+        .user-btn .fa-chevron-down {
+            font-size: 10px;
+            margin-left: 4px;
+            transition: transform 0.2s;
+        }
+
+        .user-dropdown.open .user-btn .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 220px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .user-dropdown.open .user-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            padding: 16px;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-menu-header strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .user-menu-header small {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .user-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.15s;
+        }
+
+        .user-menu a:hover {
+            background: var(--bg-alt);
+        }
+
+        .user-menu a i {
+            width: 16px;
+            color: var(--text-muted);
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        .user-menu a.logout {
+            color: #dc3545;
+        }
+
+        .user-menu a.logout i {
+            color: #dc3545;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 120px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23fff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero-label {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(200, 164, 94, 0.15);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 16px 32px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .btn-hero:hover {
+            background: var(--accent-light);
+        }
+
+        .btn-hero-outline {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 16px 32px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .btn-hero-outline:hover {
+            background: #fff;
+            color: var(--primary);
+        }
+
+        
+    /* Sidebar */
+    .sidebar-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .sidebar-header i {
+      color: var(--accent);
+      margin-right: 8px;
+    }
+
+    /* Categorías - Nivel 1 */
+    .category-tree {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .category-tree li {
+      margin-bottom: 0;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .category-item:hover {
+      background: var(--bg-alt);
+      color: var(--accent);
+    }
+
+    .category-item.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .category-item i {
+      width: 28px;
+      margin-right: 10px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .category-toggle {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      font-size: 12px;
+      transition: transform 0.3s;
+    }
+
+    .category-toggle.open {
+      transform: rotate(90deg);
+    }
+
+    /* Categorías - Nivel 2 (subcategorías/marcas) */
+    .subcategories {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      background: #f9f9f9;
+    }
+
+    .subcategories.open {
+      max-height: 2000px;
+    }
+
+    .subcategory-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px 10px 48px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: all 0.2s;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-light);
+      text-decoration: none;
+    }
+
+    .subcategory-item:hover {
+      background: #f0f0f0;
+      color: var(--accent);
+    }
+
+    .subcategory-item.active {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Categorías - Nivel 3 */
+    .sub-subcategories {
+      padding-left: 0;
+      list-style: none;
+      background: #f0f0f0;
+    }
+
+    .sub-subcategory-item {
+      padding: 8px 16px 8px 72px;
+      font-size: 12px;
+      color: var(--text-light);
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .sub-subcategory-item:hover {
+      background: #e8e8e8;
+      color: var(--accent);
+    }
+
+    .sub-subcategory-item.active {
+      background: #fff3cd;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Breadcrumb */
+    .category-breadcrumb {
+      background: #fff;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .category-breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .category-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    /* Product Cards */
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.3s ease-out;
+      z-index: 2;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      border-color: transparent;
+    }
+
+    .product-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+      padding: 16px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .product-card .card-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 44px;
+      line-height: 1.3;
+    }
+
+    .product-sku {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: auto;
+    }
+
+    .product-price small {
+      font-size: 11px;
+      color: var(--text-light);
+      font-weight: 400;
+    }
+
+    /* Precio oculto */
+    .price-hidden {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .price-hidden:hover {
+      color: white;
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    .price-hidden i {
+      margin-right: 5px;
+    }
+
+    /* Banner login */
+    .login-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .login-banner.hidden {
+      display: none;
+    }
+
+    .login-banner h5 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .login-banner p {
+      margin: 4px 0 0;
+      opacity: 0.9;
+      font-size: 13px;
+    }
+
+    .login-banner .btn {
+      background: #fff;
+      color: #667eea;
+      border: none;
+      font-weight: 600;
+    }
+
+    /* Filter section */
+    .price-section {
+      padding: 16px;
+    }
+
+    .price-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .price-row input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--primary) !important;
+      border-color: var(--primary) !important;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
+    }
+
+    /* User menu */
+    .user-menu {
+      position: relative;
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      min-width: 180px;
+      display: none;
+      z-index: 200;
+      overflow: hidden;
+    }
+
+    .user-dropdown.show {
+      display: block;
+    }
+
+    .user-info-panel {
+      padding: 12px 16px;
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .user-dropdown a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .user-dropdown a:hover {
+      background: var(--bg-alt);
+      color: var(--accent);
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--primary);
+      color: #fff;
+      padding: 30px 0;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-filters {
+        display: none;
+      }
+
+      .sidebar-filters.show {
+        display: block;
+      }
+
+      .login-banner {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .login-banner .btn {
+        margin-top: 10px;
+      }
+    }
+  </style>
+<script src="../assets/js/config.js"></script>
+</head>
+
+<body>
+  <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="logo">PLASISE</a>
+            <button class="mobile-toggle" title="Abrir menú" onclick="document.querySelector('.main-nav').classList.toggle('show')">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="main-nav">
+                <a href="index.html" >Inicio</a>
+                <a href="productos.html" class="active">Productos</a>
+                <a href="servicios.html">Servicios</a>
+                <a href="contacto.html">Contacto</a>
+            </nav>
+            <div class="header-actions">
+                <a href="carrito.html" class="cart-btn" id="cartBtn" title="Ver mi carrito">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+                <a href="login.html" class="login-btn" id="loginBtn">Acceder</a>
+
+                <!-- User Dropdown -->
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-btn" title="Menú de usuario" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-menu-header">
+                            <strong id="userFullName"></strong>
+                            <small id="userEmail"></small>
+                        </div>
+                        <a href="admin/productos.html" id="adminLink" style="display: none;"><i
+                                class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
+                        <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
+                        <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
+                        <a href="direcciones.html"><i class="fas fa-map-marker-alt"></i> Direcciones</a>
+                        <div class="user-menu-divider"></div>
+                        <a href="#" class="logout" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i>
+                            Cerrar Sesion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+  <!-- Main Content -->
+  <div class="container py-4">
+    <!-- Banner para usuarios no registrados -->
+    <div class="login-banner" id="loginBanner">
+      <div>
+        <h5><i class="fas fa-lock"></i> ¡Regístrate para ver los precios!</h5>
+        <p>Accede a precios exclusivos para profesionales del sector de seguridad</p>
+      </div>
+      <a href="registro.html" class="btn btn-light"><i class="fas fa-user-plus"></i> Registrarse Gratis</a>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="category-breadcrumb" id="breadcrumb">
+      <a href="productos.html" title="Inicio Tienda"><i class="fas fa-home"></i></a> / <span>Todos los productos</span>
+    </div>
+
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-lg-3 col-md-4">
+        <button class="btn btn-outline-primary w-100 mb-3 d-md-none" onclick="toggleFilters()">
+          <i class="fas fa-filter"></i> Filtros y Categorías
+        </button>
+
+        <div class="sidebar-filters" id="sidebarFilters">
+          <div class="sidebar-card">
+            <div class="sidebar-header"><i class="fas fa-list"></i>Categorías</div>
+            <div>
+              <ul class="category-tree" id="categoryTree">
+                <li class="text-center py-3">
+                  <div class="spinner-border spinner-border-sm text-primary"></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-header"><i class="fas fa-sliders-h"></i>Filtros</div>
+            <div class="st-sidebar-padding">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Buscar</label>
+                <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Nombre, SKU...">
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Marca</label>
+                <select id="filterBrand" class="form-select form-select-sm" title="Filtrar por marca">
+                  <option value="">Todas las marcas</option>
+                </select>
+              </div>
+              <div class="mb-3" id="priceFilterSection">
+                <label class="form-label small fw-semibold">Precio</label>
+                <div class="d-flex gap-2">
+                  <input type="number" id="minPrice" class="form-control form-control-sm" placeholder="Mín €">
+                  <input type="number" id="maxPrice" class="form-control form-control-sm" placeholder="Máx €">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Ordenar</label>
+                <select id="sortBy" class="form-select form-select-sm" title="Ordenar por">
+                  <option value="name">Nombre A-Z</option>
+                  <option value="price_asc">Precio: Menor a Mayor</option>
+                  <option value="price_desc">Precio: Mayor a Menor</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm w-100" onclick="applyFilters()">
+                <i class="fas fa-search"></i> Aplicar
+              </button>
+              <button class="btn btn-outline-secondary btn-sm w-100 mt-2"
+                onclick="document.getElementById('minPrice').value=''; document.getElementById('maxPrice').value=''; document.getElementById('searchInput').value=''; applyFilters();">
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid de Productos -->
+      <div class="col-lg-9 col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 id="categoryTitle">Todos los productos</h4>
+          <span id="resultsCount" class="text-muted small">Cargando...</span>
+        </div>
+
+        <div id="productsGrid" class="row g-3">
+          <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2 text-muted">Cargando productos...</p>
+          </div>
+        </div>
+
+        <nav class="mt-4">
+          <ul class="pagination pagination-sm justify-content-center" id="pagination"></ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+
+  <!-- Banner Servicio Técnico Gratuito -->
+  <div id="servicioTecnicoBanner" class="servicio-tecnico-banner d-none">
+    <div class="container">
+      <div class="st-content">
+        <div class="st-icon">
+          <i class="fas fa-headset"></i>
+        </div>
+        <div class="st-text">
+          <h4>🎁 ¡Servicio Técnico GRATUITO!</h4>
+          <p>Como cliente de PLASISE, tienes acceso a asistencia técnica sin coste. Te ayudamos a configurar e instalar
+            tus productos.</p>
+        </div>
+        <a href="https://wa.me/34684782268?text=Hola,%20soy%20cliente%20de%20PLASISE%20y%20necesito%20asistencia%20técnica"
+          target="_blank" rel="noopener" class="st-button">
+          <i class="fab fa-whatsapp"></i> Solicitar Asistencia
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banner para NO logueados -->
+  <div id="registrateBanner" class="registrate-banner d-none">
+    <div class="container">
+      <div class="st-content">
+        <div class="st-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+        <div class="st-text">
+          <h4>¿Sabías que nuestros clientes tienen Servicio Técnico GRATIS?</h4>
+          <p>Regístrate y accede a asistencia técnica sin coste para configurar tus productos.</p>
+        </div>
+        <a href="registro.html" class="st-button st-button-secondary">
+          <i class="fas fa-user-plus"></i> Registrarse
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .servicio-tecnico-banner,
+    .registrate-banner {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      padding: 20px 0;
+      margin: 20px 0;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .registrate-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .st-content {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .st-content {
+        flex-wrap: nowrap;
+        text-align: left;
+      }
+    }
+
+    .st-icon {
+      font-size: 3rem;
+      color: white;
+      opacity: 0.9;
+    }
+
+    .st-text {
+      flex: 1;
+      color: white;
+    }
+
+    .st-text h4 {
+      margin: 0 0 5px 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .st-text p {
+      margin: 0;
+      opacity: 0.95;
+      font-size: 0.95rem;
+    }
+
+    .st-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      color: #28a745;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .st-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      color: #28a745;
+    }
+
+    .st-button-secondary {
+      color: #667eea;
+    }
+
+    .st-button-secondary:hover {
+      color: #667eea;
+    }
+
+    .st-button i {
+      font-size: 1.2rem;
+    }
+  </style>
+
+  <script>
+    // Mostrar banner según estado de login
+    function mostrarBannerServicioTecnico() {
+      const bannerLogueado = document.getElementById('servicioTecnicoBanner');
+      const bannerNoLogueado = document.getElementById('registrateBanner');
+
+      if (typeof isLoggedIn !== 'undefined' && isLoggedIn) {
+        if (bannerLogueado) bannerLogueado.style.display = 'block';
+        if (bannerNoLogueado) bannerNoLogueado.style.display = 'none';
+      } else {
+        if (bannerLogueado) bannerLogueado.style.display = 'none';
+        if (bannerNoLogueado) bannerNoLogueado.style.display = 'block';
+      }
+    }
+
+    // Ejecutar después de verificar auth
+    if (typeof checkAuth === 'function') {
+      const originalCheckAuth = checkAuth;
+      checkAuth = async function () {
+        await originalCheckAuth();
+        mostrarBannerServicioTecnico();
+      };
+    } else {
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(mostrarBannerServicioTecnico, 500);
+      });
+    }
+  </script>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_BASE_URL = window.location.pathname.startsWith('/plasise') ? '/plasise/api/v1' : '/api/v1';
+    let currentPage = 1;
+    let currentCategory = null;
+    let isLoggedIn = false;
+    let userRole = null;
+    let categoriesData = [];
+
+    const categoryIcons = {
+      'video': 'fa-video', 'accesos': 'fa-door-open', 'intrusion': 'fa-shield-alt',
+      'incendio': 'fa-fire', 'camaras-analogicas': 'fa-camera', 'camaras-ip': 'fa-camera',
+      'grabadores': 'fa-hdd', 'accesorios-video': 'fa-tools', 'default': 'fa-folder'
+    };
+
+    function getIcon(slug, icono) {
+      if (icono) return 'fa-' + icono;
+      return categoryIcons[slug] || categoryIcons['default'];
+    }
+
+    // Verificar sesión
+    async function checkUserSession() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/session`, { credentials: 'include' });
+        const data = await response.json();
+        if (data.authenticated) {
+          isLoggedIn = true;
+          userRole = data.user.rol;
+
+          // Ocultar botón "Acceder" y mostrar menú de usuario
+          const loginBtn = document.getElementById('loginBtn');
+          if (loginBtn) loginBtn.style.display = 'none';
+
+          const userDropdown = document.getElementById('userDropdown');
+          if (userDropdown) userDropdown.style.display = 'flex';
+
+          const userName = document.getElementById('userName');
+          if (userName) userName.textContent = data.user.nombre;
+
+          const userFullName = document.getElementById('userFullName');
+          if (userFullName) userFullName.textContent = (data.user.nombre || '') + ' ' + (data.user.apellidos || '');
+
+          const userEmail = document.getElementById('userEmail');
+          if (userEmail) userEmail.textContent = data.user.email || '';
+
+          // Mostrar carrito
+          const cartBtn = document.getElementById('cartBtn');
+          if (cartBtn) cartBtn.style.display = 'flex';
+
+          // Ocultar banner de login
+          const banner = document.getElementById('loginBanner');
+          if (banner) banner.style.display = 'none';
+
+          // Mostrar link admin si corresponde
+          const adminRoles = ['admin', 'administrador', 'super_admin'];
+          if (adminRoles.includes(data.user.rol)) {
+            const adminLink = document.getElementById('adminLink');
+            if (adminLink) {
+              adminLink.style.display = 'flex';
+              adminLink.classList.remove('d-none');
+            }
+          }
+        } else {
+          // No logueado: ocultar filtro de precio
+          const priceFilter = document.getElementById('priceFilterSection');
+          if (priceFilter) priceFilter.style.display = 'none';
+
+          // Asegurar que el dropdown de usuario está oculto
+          const userDropdown = document.getElementById('userDropdown');
+          if (userDropdown) userDropdown.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error verificando sesión:', error);
+        // En caso de error de red, ocultar dropdown
+        const userDropdown = document.getElementById('userDropdown');
+        if (userDropdown) userDropdown.style.display = 'none';
+      }
+    }
+
+    // Toggle menu
+    function toggleUserMenu() {
+        document.getElementById('userDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('open');
+        }
+    });
+
+    async function logout() {
+        await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+        window.location.reload();
+    }
+
+    // Cargar productos
+    async function loadProducts(page = 1) {
+      currentPage = page;
+      const params = new URLSearchParams({ page, per_page: 12 });
+
+      if (currentCategory) params.append('categoria', currentCategory);
+
+      const brandEl = document.getElementById('filterBrand');
+      const brand = brandEl ? brandEl.value : '';
+      
+      const searchEl = document.getElementById('searchInput');
+      const search = searchEl ? searchEl.value : '';
+      
+      const sortEl = document.getElementById('sortBy');
+      const sort = sortEl ? sortEl.value : '';
+
+      if (brand) params.append('marca_id', brand);
+      if (search) params.append('search', search);
+      if (sort) params.append('sort', sort);
+
+      // Solo añadir filtros de precio si está logueado
+      if (isLoggedIn) {
+        if (document.getElementById('minPrice')) {
+          const min = document.getElementById('minPrice').value.trim();
+          if (min !== '') params.append('min_price', min);
+        }
+        if (document.getElementById('maxPrice')) {
+          const max = document.getElementById('maxPrice').value.trim();
+          if (max !== '') params.append('max_price', max);
+        }
+      }
+
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div></div>';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/products?${params}`);
+        const data = await response.json();
+
+        grid.innerHTML = '';
+
+        if (!data.success || !data.products || data.products.length === 0) {
+          grid.innerHTML = '<div class="col-12 text-center py-5 text-muted"><i class="fas fa-box-open fa-3x mb-3"></i><p>No se encontraron productos</p></div>';
+          const rCount = document.getElementById('resultsCount');
+          if (rCount) rCount.textContent = '0 productos';
+          const pag = document.getElementById('pagination');
+          if (pag) pag.innerHTML = '';
+          return;
+        }
+
+        data.products.forEach(p => {
+          const col = document.createElement('div');
+          col.className = 'col-lg-4 col-md-6 col-sm-6';
+
+          // Mostrar precio o botón de registro según estado de login
+          let priceSection;
+          if (isLoggedIn) {
+            priceSection = `
+              <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                <div class="product-price">${formatPrice(p.precio_base)}</div>
+                <button class="btn btn-sm" style="background-color: var(--primary); color: var(--accent); border: 1px solid var(--accent);" onclick="event.stopPropagation(); addToCart(${p.id})">
+                  <i class="fas fa-cart-plus"></i> Añadir
+                </button>
+              </div>
+            `;
+          } else {
+            priceSection = `
+              <div class="mt-auto pt-2">
+                <a href="login.html" onclick="event.stopPropagation();" class="price-hidden d-block">
+                  <i class="fas fa-lock"></i> Inicia sesión para ver precio
+                </a>
+              </div>
+            `;
+          }
+
+          col.innerHTML = `
+            <div class="product-card h-100" style="cursor: pointer;" onclick="window.location.href='producto-detalle.html?id=${p.id}'">
+              <img src="${p.imagen_principal || 'https://via.placeholder.com/300x200?text=Sin+Imagen'}" 
+                   alt="${p.nombre}" loading="lazy"
+                   onerror="this.src='https://via.placeholder.com/300x200?text=Sin+Imagen'">
+              <div class="card-body d-flex flex-column">
+                <div class="product-title text-truncate" title="${p.nombre}">${p.nombre}</div>
+                <div class="product-sku text-muted small">${p.sku || ''}</div>
+                ${priceSection}
+              </div>
+            </div>
+          `;
+          grid.appendChild(col);
+        });
+
+        const rCount = document.getElementById('resultsCount');
+        if (rCount) rCount.textContent = `${data.total} productos`;
+        
+        const pag = document.getElementById('pagination');
+        if (pag) renderPagination(data.total, data.page, data.pages);
+
+      } catch (error) {
+        console.error('Error:', error);
+        grid.innerHTML = '<div class="col-12 text-center text-danger py-5"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><p>Error al cargar productos</p></div>';
+      }
+    }
+
+    // Cargar categorías
+    async function loadCategoryTree() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        const data = await response.json();
+        if (data.success && data.categories) {
+          categoriesData = data.categories;
+          renderCategoryTree(data.categories);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    function renderCategoryTree(categories, container, level = 0) {
+      if (!container) {
+        container = document.getElementById('categoryTree');
+        if (!container) return; // Prevent crash if sidebar is missing
+        container.innerHTML = '';
+
+        const allLi = document.createElement('li');
+        allLi.innerHTML = `<a href="#" class="category-item ${!currentCategory ? 'active' : ''}" onclick="selectCategory(null); return false;">
+          <i class="fas fa-th-large"></i> Todos los productos</a>`;
+        container.appendChild(allLi);
+      }
+
+      categories.forEach(cat => {
+        const li = document.createElement('li');
+        const hasChildren = cat.children && cat.children.length > 0;
+        const isActive = currentCategory === cat.id;
+
+        // Indent based on level
+        const paddingLeft = 16 + (level * 20);
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `category-item ${isActive ? 'active' : ''}`;
+        itemDiv.style.paddingLeft = `${paddingLeft}px`;
+        itemDiv.dataset.id = cat.id;
+
+        itemDiv.innerHTML = `
+          <i class="fas ${getIcon(cat.slug, cat.icono)}"></i>
+          <span>${cat.nombre}</span>
+          ${hasChildren ? '<i class="fas fa-chevron-right category-toggle"></i>' : ''}
+        `;
+
+        itemDiv.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (hasChildren) {
+            const toggle = itemDiv.querySelector('.category-toggle');
+            const subUl = li.querySelector('.subcategories');
+            if (toggle && subUl) {
+              toggle.classList.toggle('open');
+              subUl.classList.toggle('open');
+            }
+          }
+          selectCategory(cat.id);
+        });
+
+        li.appendChild(itemDiv);
+
+        if (hasChildren) {
+          const subUl = document.createElement('ul');
+          subUl.className = 'subcategories';
+          subUl.id = `subcats-${cat.id}`;
+          // Check if any child is currently selected or if we should keep it closed
+          // For now, keep it closed as requested unless we are initializing and it's a parent of currentCategory
+          renderCategoryTree(cat.children, subUl, level + 1);
+          li.appendChild(subUl);
+        }
+
+        container.appendChild(li);
+      });
+    }
+
+    function selectCategory(catId) {
+      currentCategory = catId;
+      currentPage = 1;
+
+      // Update active state in UI
+      document.querySelectorAll('.category-item').forEach(el => {
+        if (parseInt(el.dataset.id) === catId || (catId === null && !el.dataset.id)) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+      if (catId) {
+        const cat = findCategory(categoriesData, catId);
+        if (cat) {
+          document.getElementById('categoryTitle').textContent = cat.nombre;
+          updateBreadcrumb(cat);
+        }
+      } else {
+        document.getElementById('categoryTitle').textContent = 'Todos los productos';
+        document.getElementById('breadcrumb').innerHTML = '<a href="productos.html"><i class="fas fa-home"></i></a> / <span>Todos los productos</span>';
+      }
+      loadProducts();
+    }
+
+    function findCategory(cats, id) {
+      for (let cat of cats) {
+        if (cat.id === id) return cat;
+        if (cat.children) {
+          const found = findCategory(cat.children, id);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function findParentCategory(cats, childId, parent = null) {
+      for (let cat of cats) {
+        if (cat.id === childId) return parent;
+        if (cat.children) {
+          const found = findParentCategory(cat.children, childId, cat);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function updateBreadcrumb(cat) {
+      let breadcrumb = '<a href="productos.html"><i class="fas fa-home"></i></a>';
+      const parents = [];
+      let current = cat;
+      while (current) {
+        parents.unshift(current);
+        current = findParentCategory(categoriesData, current.id);
+      }
+      parents.forEach((p, i) => {
+        breadcrumb += i === parents.length - 1
+          ? ` / <span>${p.nombre}</span>`
+          : ` / <a href="#" onclick="selectCategory(${p.id}); return false;">${p.nombre}</a>`;
+      });
+      document.getElementById('breadcrumb').innerHTML = breadcrumb;
+    }
+
+    function renderPagination(total, current, pages) {
+      const nav = document.getElementById('pagination');
+      if (!nav) return;
+      nav.innerHTML = '';
+      if (pages <= 1) return;
+
+      nav.innerHTML = `
+        <li class="page-item ${current === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="loadProducts(${current - 1}); return false;">«</a>
+        </li>
+      `;
+
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || (i >= current - 2 && i <= current + 2)) {
+          nav.innerHTML += `<li class="page-item ${i === current ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="loadProducts(${i}); return false;">${i}</a></li>`;
+        } else if (i === current - 3 || i === current + 3) {
+          nav.innerHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+      }
+
+      nav.innerHTML += `
+        <li class="page-item ${current === pages ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="loadProducts(${current + 1}); return false;">»</a>
+        </li>
+      `;
+    }
+
+    async function loadBrands() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/brands`);
+        const data = await response.json();
+        if (data.success && data.brands) {
+          const select = document.getElementById('filterBrand');
+          if (select) {
+            data.brands.forEach(b => {
+              const opt = document.createElement('option');
+              opt.value = b.id;
+              opt.textContent = b.nombre;
+              select.appendChild(opt);
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    async function loadCartCount() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/cart`, { credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          const cCount = document.getElementById('cartCount');
+          if (cCount) cCount.textContent = data.items_count || 0;
+        }
+      } catch (error) { console.error('Error:', error); }
+    }
+
+    async function addToCart(productId) {
+      if (!isLoggedIn) {
+        window.location.href = 'login.html';
+        return;
+      }
+      try {
+        const response = await fetch(`${API_BASE_URL}/cart/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ producto_id: productId, cantidad: 1 })
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+          loadCartCount();
+          showToast('Producto añadido al carrito', 'success');
+        } else {
+          showToast(data.error || 'Error', 'danger');
+        }
+      } catch (error) {
+        showToast('Error de conexión', 'danger');
+      }
+    }
+
+    function formatPrice(price) {
+      return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price);
+    }
+
+    function applyFilters() { loadProducts(1); }
+    function toggleFilters() { document.getElementById('sidebarFilters').classList.toggle('show'); }
+
+    function showToast(message, type) {
+      const toast = document.createElement('div');
+      toast.className = `alert alert-${type} position-fixed top-0 start-50 translate-middle-x mt-3`;
+      toast.style.zIndex = '9999';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Menú usuario
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    if (userMenuBtn) {
+      userMenuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        document.getElementById('userDropdown').classList.toggle('show');
+      });
+    }
+    
+    document.addEventListener('click', () => {
+        const drop = document.getElementById('userDropdown');
+        if (drop) drop.classList.remove('show');
+    });
+
+    const logoutLink = document.getElementById('logoutLink');
+    if (logoutLink) {
+      logoutLink.addEventListener('click', async function (e) {
+        e.preventDefault();
+        try {
+          await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+          window.location.reload();
+        } catch (err) { window.location.reload(); }
+      });
+    }
+
+    // Inicializar — el orden importa: auth PRIMERO, luego carga de datos
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // 1. Verificar sesión (establece isLoggedIn antes de cargar productos)
+        await checkUserSession();
+        
+        // 2. Cargar datos en paralelo (Categorías, Marcas, Carrito)
+        // Usamos catch individual para que si uno falla no bloquee la carga de productos
+        await Promise.allSettled([
+          loadCategoryTree(),
+          loadBrands(),
+          loadCartCount()
+        ]);
+      } catch (err) {
+        console.error('Error during early initialization:', err);
+      } finally {
+        // 3. Cargar productos SIEMPRE, incluso si lo anterior falló parcial o totalmente
+        // Esto quita el spinner de carga y muestra algo al usuario
+        await loadProducts(1);
+      }
+    });
+  </script>
+
+  <!-- n8n Chat Widget -->
+  <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+  <style>
+    :root {
+      --chat--color-primary: #667eea;
+      --chat--color-primary-shade-50: #5a6fd6;
+      --chat--color-primary-shade-100: #4e60c2;
+      --chat--color-secondary: #764ba2;
+      --chat--color-white: #ffffff;
+      --chat--color-light: #f5f6fa;
+      --chat--color-light-shade-50: #e8eaf6;
+      --chat--color-medium: #667eea;
+      --chat--color-dark: #1a1a2e;
+      --chat--color-disabled: #9ca3af;
+      --chat--color-typing: #667eea;
+      --chat--spacing: 1rem;
+      --chat--border-radius: 12px;
+      --chat--transition-duration: 0.2s;
+      --chat--window--width: 400px;
+      --chat--window--height: 600px;
+      --chat--header-height: auto;
+      --chat--header--padding: 1rem;
+      --chat--header--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --chat--header--color: #ffffff;
+      --chat--header--border-bottom: none;
+      --chat--textarea--height: 50px;
+      --chat--message--bot--background: #f0f0f5;
+      --chat--message--bot--color: #1a1a2e;
+      --chat--message--user--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --chat--message--user--color: #ffffff;
+      --chat--message--pre--background: #1a1a2e;
+      --chat--toggle--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --chat--toggle--hover--background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+      --chat--toggle--active--background: linear-gradient(135deg, #4e60c2 0%, #5e3980 100%);
+      --chat--toggle--color: #ffffff;
+      --chat--toggle--size: 60px;
+      --chat--button--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --chat--button--hover--background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+      --chat--button--active--background: linear-gradient(135deg, #4e60c2 0%, #5e3980 100%);
+      --chat--button--color: #ffffff;
+    }
+
+    /* Ajustes adicionales */
+    .n8n-chat .chat-toggle {
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .n8n-chat .chat-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+    }
+
+    .n8n-chat .chat-window {
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .n8n-chat .chat-message-bot {
+      border-radius: 12px 12px 12px 4px;
+    }
+
+    .n8n-chat .chat-message-user {
+      border-radius: 12px 12px 4px 12px;
+    }
+  </style>
+  <script type="module">
+    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+    createChat({
+      webhookUrl: 'https://n0cker-n8n.v6hb8q.easypanel.host/webhook/d745d2b0-b19c-4f8b-a862-48867b8d9be0/chat',
+      mode: 'window',
+      showWelcomeScreen: true,
+      defaultLanguage: 'es',
+      i18n: {
+        es: {
+          title: 'Asistente PLASISE',
+          subtitle: '¿En qué podemos ayudarte?',
+          footer: '',
+          getStarted: 'Iniciar conversación',
+          inputPlaceholder: 'Escribe tu mensaje...',
+          closeButtonTooltip: 'Cerrar chat'
+        }
+      }
+    });
+  </script>
+
+  <!-- Offcanvas Backdrop & Menu Script Fixes -->
+  <div class="offcanvas-backdrop-luxe" id="offcanvasBackdrop" onclick="closeMobileMenu()"></div>
+  <script>
+    function openMobileMenu() {
+      const menu = document.getElementById('navbarNav');
+      if (menu) {
+        menu.classList.add('mobile-offcanvas'); // Force the class to make it slide-able
+        menu.classList.add('show');
+        document.getElementById('offcanvasBackdrop').classList.add('show');
+        document.body.style.overflow = 'hidden'; // prevent scrolling
+      }
+    }
+
+    function closeMobileMenu() {
+      const menu = document.getElementById('navbarNav');
+      if (menu) {
+        menu.classList.remove('show');
+        document.getElementById('offcanvasBackdrop').classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Attach to existing hamburger menu
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggler = document.querySelector('.navbar-toggler');
+      if (toggler) {
+        // Remove bootstrap's default data-bs-toggle to prevent conflicts
+        toggler.removeAttribute('data-bs-toggle');
+        toggler.addEventListener('click', function (e) {
+          e.preventDefault();
+          openMobileMenu();
+        });
+      }
+
+      // Ensure nav links close the menu when clicked
+      document.querySelectorAll('.mobile-offcanvas .nav-link').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+      });
+
+      // Sync mobile cart count with desktop count
+      const targetNode = document.getElementById('cartCount');
+      if (targetNode) {
+        const observer = new MutationObserver(function (mutations) {
+          const mobileCount = document.getElementById('mobileCartCount');
+          if (mobileCount) {
+            mobileCount.textContent = targetNode.textContent;
+          }
+        });
+        observer.observe(targetNode, { characterData: true, childList: true, subtree: true });
+      }
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+      <p class="mb-2">&copy; 2026 PLASISE. Todos los derechos reservados.</p>
+      <div class="legal-links small">
+        <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a> | 
+        <a href="legales/politica-privacidad.html" class="text-white-50 text-decoration-none mx-2">Privacidad</a> | 
+        <a href="legales/politica-cookies.html" class="text-white-50 text-decoration-none mx-2">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script de Cookies -->
+  <script src="../assets/js/cookies.js"></script>
+  <!-- Cookies Banner -->
+  <link rel="stylesheet" href="../assets/css/cookies.css">
+  <script src="../assets/js/cookies.js"></script>
+</body>
+
+</html>

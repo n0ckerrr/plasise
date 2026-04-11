@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Eventos - PLASISE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #0a0a0f;
+            --sidebar-hover: #16161d;
+            --accent: #c8a45e;
+            --text-light: #a0a0a0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .avatar-icon {
+            width: 36px;
+            height: 36px;
+        }
+
+        .filter-input {
+            max-width: 300px;
+        }
+
+        .filter-select {
+            max-width: 200px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 24px;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-brand span {
+            color: var(--accent);
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            padding: 10px 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: var(--accent);
+        }
+
+        .nav-item.active {
+            background: var(--sidebar-hover);
+            border-left-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .nav-item i {
+            width: 24px;
+            margin-right: 12px;
+        }
+
+        /* Main */
+        .main {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .topbar {
+            background: #fff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-title {
+            font-size: 20px;
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Content */
+        .content {
+            padding: 30px;
+            flex: 1;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            margin: 0;
+            min-width: 800px;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #666;
+            border: none;
+            padding: 16px 20px;
+        }
+
+        .table td {
+            padding: 16px 20px;
+            vertical-align: middle;
+            border-color: #f0f0f0;
+        }
+
+        /* Badges */
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge-warning {
+            background: #fff8e1;
+            color: #f9a825;
+        }
+
+        .badge-info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            padding: 20px 24px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .table-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-toolbar .d-flex {
+                flex-direction: column;
+            }
+        }
+    </style>
+<script src="../../assets/js/config.js"></script>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-shield-alt"></i>
+            PLASI<span>SE</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">Principal</div>
+            <a href="index.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+
+            <div class="nav-section">Catálogo</div>
+            <a href="productos.html" class="nav-item"><i class="fas fa-boxes"></i> Productos</a>
+            <a href="categorias.html" class="nav-item"><i class="fas fa-folder-tree"></i> Categorías</a>
+            <a href="marcas.html" class="nav-item"><i class="fas fa-tags"></i> Marcas</a>
+
+            <div class="nav-section">Ventas</div>
+            <a href="pedidos.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+
+            <div class="nav-section">Usuarios</div>
+            <a href="usuarios.html" class="nav-item"><i class="fas fa-users"></i> Usuarios</a>
+
+            <div class="nav-section">Sistema</div>
+            <a href="eventos.html" class="nav-item active"><i class="fas fa-microchip"></i> Eventos Log</a>
+            <a href="notificaciones.html" class="nav-item"><i class="fas fa-bell"></i> Notificaciones</a>
+            <a href="../index.html" class="nav-item"><i class="fas fa-external-link-alt"></i> Ver Tienda</a>
+            <a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link d-lg-none" title="Abrir Menú"
+                    onclick="document.getElementById('sidebar').classList.toggle('show')">
+                    <i class="fas fa-bars fa-lg text-dark"></i>
+                </button>
+                <h1 class="topbar-title m-0">Registro de Eventos</h1>
+            </div>
+            <div class="topbar-user">
+                <span id="adminName">Admin</span>
+                <div
+                    class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center avatar-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="table-card">
+                <div class="table-toolbar">
+                    <div class="d-flex gap-2 flex-grow-1">
+                        <input type="text" id="filterScript" class="form-control filter-input"
+                            placeholder="Buscar por nombre de script...">
+                        <select id="filterType" class="form-select filter-select" title="Seleccionar Tipo de Evento">
+                            <option value="">Cualquier tipo</option>
+                            <option value="INFO">INFO</option>
+                            <option value="SUCCESS">SUCCESS</option>
+                            <option value="ERROR">ERROR</option>
+                            <option value="WARNING">WARNING</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="loadEvents(1)">
+                            <i class="fas fa-search me-2"></i>Filtrar
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="resetFilters()" title="Restablecer Filtros">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-success" onclick="executeScript('ibd_downloader', this)">
+                            <i class="fas fa-download me-2"></i>Descargar Catálogo IBD
+                        </button>
+                        <button class="btn btn-outline-info" onclick="executeScript('sync_ibd_prices', this)">
+                            <i class="fas fa-sync-alt me-2"></i>Sincronizar Precios IBD
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="80">ID</th>
+                                <th width="200">Fecha / Hora</th>
+                                <th width="200">Script Name</th>
+                                <th width="120">Estado</th>
+                                <th>Mensaje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <div class="mt-2 text-muted">Cargando eventos...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-container">
+                    <div class="text-muted" id="pageInfo">Mostrando 0 - 0 de 0 eventos</div>
+                    <ul class="pagination pagination-sm m-0" id="pagination">
+                        <!-- Pagination items will be generated here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+        let currentPage = 1;
+
+        async function checkAuth() {
+            try {
+                const r = await fetch(`${API}/auth/session`, { credentials: 'include' });
+                const d = await r.json();
+                if (!d.authenticated || (d.user.rol !== 'admin' && d.user.rol !== 'super_admin' && d.user.rol !== 'administrador')) {
+                    window.location.href = '../login.html?redirect=admin/eventos.html';
+                    return false;
+                }
+                document.getElementById('adminName').textContent = d.user.nombre;
+                return true;
+            } catch (e) {
+                window.location.href = '../login.html?redirect=admin/eventos.html';
+                return false;
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const d = new Date(dateString);
+            return d.toLocaleDateString('es-ES', {
+                year: 'numeric', month: 'short', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
+        function getBadgeClass(type) {
+            switch (type?.toUpperCase()) {
+                case 'SUCCESS': return 'badge-success';
+                case 'ERROR': return 'badge-error';
+                case 'WARNING': return 'badge-warning';
+                case 'INFO': return 'badge-info';
+                default: return 'badge-info';
+            }
+        }
+
+        async function loadEvents(page = 1) {
+            currentPage = page;
+            const scriptName = document.getElementById('filterScript').value;
+            const eventType = document.getElementById('filterType').value;
+
+            const tbody = document.getElementById('eventsTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>';
+
+            try {
+                let params = new URLSearchParams({ page: page, per_page: 50 });
+                if (scriptName) params.append('script_name', scriptName);
+                if (eventType) params.append('event_type', eventType);
+
+                const r = await fetch(`${API}/admin/events?${params}`, { credentials: 'include' });
+                const d = await r.json();
+
+                if (d.success) {
+                    if (d.events.length === 0) {
+                        tbody.innerHTML = `
+              <tr>
+                <td colspan="5" class="text-center py-5">
+                  <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                  <h5 class="text-muted">No se encontraron eventos</h5>
+                  <p class="text-muted small mb-0">No hay registros que coincidan con los filtros actuales.</p>
+                </td>
+              </tr>
+            `;
+                    } else {
+                        tbody.innerHTML = d.events.map(e => `
+              <tr>
+                <td class="text-muted">#${e.id}</td>
+                <td><strong>${formatDate(e.timestamp)}</strong></td>
+                <td><i class="fas fa- terminal me-2 text-muted"></i>${e.script_name}</td>
+                <td><span class="badge-status ${getBadgeClass(e.event_type)}">${e.event_type}</span></td>
+                <td>${e.message || '-'}</td>
+              </tr>
+            `).join('');
+                    }
+
+                    updatePagination(d.total, d.page, d.pages);
+                } else {
+                    throw new Error(d.error || 'Error al cargar eventos');
+                }
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-2"></i>${e.message}</td></tr>`;
+            }
+        }
+
+        function updatePagination(total, page, pages) {
+            const start = (page - 1) * 50 + 1;
+            const end = Math.min(page * 50, total);
+            document.getElementById('pageInfo').textContent = `Mostrando ${total > 0 ? start : 0} - ${end} de ${total} eventos`;
+
+            const pUl = document.getElementById('pagination');
+            let html = '';
+
+            if (pages > 1) {
+                // Prev
+                html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
+                  <a class="page-link" href="#" onclick="event.preventDefault(); if(${page} > 1) loadEvents(${page - 1})"><i class="fas fa-chevron-left"></i></a>
+                 </li>`;
+
+                // Pages (simple version, max 5)
+                let startPage = Math.max(1, page - 2);
+                let endPage = Math.min(pages, startPage + 4);
+                if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    html += `<li class="page-item ${i === page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="event.preventDefault(); loadEvents(${i})">${i}</a>
+                   </li>`;
+                }
+
+                // Next
+                html += `<li class="page-item ${page === pages ? 'disabled' : ''}">
+                  <a class="page-link" href="#" onclick="event.preventDefault(); if(${page} < ${pages}) loadEvents(${page + 1})"><i class="fas fa-chevron-right"></i></a>
+                 </li>`;
+            }
+            pUl.innerHTML = html;
+        }
+
+        function resetFilters() {
+            document.getElementById('filterScript').value = '';
+            document.getElementById('filterType').value = '';
+            loadEvents(1);
+        }
+
+        // Filter on Enter key
+        document.getElementById('filterScript').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') loadEvents(1);
+        });
+
+        // Execute Script Function
+        async function executeScript(scriptName, btnElement) {
+            if (!confirm(`¿Estás seguro de que deseas ejecutar el script '${scriptName}'?\nEsto puede tomar un tiempo y consumirá recursos en segundo plano.`)) {
+                return;
+            }
+
+            const originalText = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Lanzando...';
+
+            try {
+                const r = await fetch(`${API}/admin/scripts/execute`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ script_name: scriptName })
+                });
+                const d = await r.json();
+
+                if (d.success) {
+                    alert('Ejecución iniciada: \n' + d.message);
+                    // Recargar tabla en unos segundos asumiendo que el script generará pronto un primer evento INFO
+                    setTimeout(() => loadEvents(1), 3000);
+                } else {
+                    alert('Error al ejecutar el script: \n' + (d.error || 'Error desconocido'));
+                }
+            } catch (e) {
+                alert('Ocurrió un error en la comunicación con el servidor: ' + e.message);
+            } finally {
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalText;
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' });
+            window.location.href = '../login.html';
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (await checkAuth()) {
+                loadEvents(1);
+            }
+        });
+    </script>
+    <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Productos - PLASISE Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --sidebar-bg: #0a0a0f; --sidebar-hover: #16161d; --accent: #c8a45e; --text-light: #a0a0a0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafafa; }
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--sidebar-bg); color: #fff; z-index: 100; }
+    .sidebar-brand { padding: 20px; font-size: 24px; font-family: 'Playfair Display', serif; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-brand span { color: var(--accent); }
+    .sidebar-nav { padding: 20px 0; }
+    .nav-section { padding: 10px 20px; font-size: 11px; text-transform: uppercase; color: var(--text-light); letter-spacing: 1px; }
+    .nav-item { display: flex; align-items: center; padding: 12px 20px; color: #fff; text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent; }
+    .nav-item:hover { background: var(--sidebar-hover); color: var(--accent); }
+    .nav-item.active { background: var(--sidebar-hover); border-left-color: var(--accent); color: var(--accent); }
+    .nav-item i { width: 24px; margin-right: 12px; }
+    .main { margin-left: 260px; min-height: 100vh; }
+    .topbar { background: #fff; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .topbar-title { font-size: 20px; font-family: 'Playfair Display', serif; font-weight: 600; }
+    .content { padding: 30px; }
+    .card { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .card-header { background: #fff; border-bottom: 1px solid #eee; padding: 16px 20px; font-weight: 600; }
+    .table th { background: #f8f9fa; font-weight: 600; font-size: 11px; text-transform: uppercase; color: #666; }
+    .table td { vertical-align: middle; }
+    .product-img { width: 50px; height: 50px; object-fit: contain; border-radius: 8px; background: #f8f9fa; }
+    .badge-activo { background: #e8f5e9; color: #388e3c; }
+    .badge-inactivo { background: #ffebee; color: #d32f2f; }
+    .badge-outlet { background: #fff3e0; color: #f57c00; }
+    .search-filters { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-accent:hover { background: #b8944e; border-color: #b8944e; color: #fff; }
+    .modal-header { background: var(--sidebar-bg); color: #fff; }
+    .modal-header .btn-close { filter: invert(1); }
+    @media (max-width: 992px) { .sidebar { display: none; } .main { margin-left: 0; } }
+  </style>
+<script src="../../assets/js/config.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><i class="fas fa-shield-alt me-2"></i>PLASI<span>SE</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="index.html" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      <div class="nav-section">Catálogo</div>
+      <a href="productos.html" class="nav-item active"><i class="fas fa-boxes"></i> Productos</a>
+      <a href="categorias.html" class="nav-item"><i class="fas fa-folder-tree"></i> Categorías</a>
+      <a href="marcas.html" class="nav-item"><i class="fas fa-tags"></i> Marcas</a>
+      <div class="nav-section">Ventas</div>
+      <a href="pedidos.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+      <div class="nav-section">Usuarios</div>
+      <a href="usuarios.html" class="nav-item"><i class="fas fa-users"></i> Usuarios</a>
+      <div class="nav-section">Sistema</div>
+      <a href="eventos.html" class="nav-item"><i class="fas fa-microchip"></i> Eventos Log</a>
+      <a href="notificaciones.html" class="nav-item"><i class="fas fa-bell"></i> Notificaciones</a>
+
+      <a href="../productos.html" class="nav-item"><i class="fas fa-external-link-alt"></i> Ver Tienda</a>
+      <a href="#" class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 class="topbar-title"><i class="fas fa-boxes me-2"></i>Gestión de Productos</h1>
+      <button class="btn btn-accent" onclick="openModal()"><i class="fas fa-plus me-2"></i>Nuevo Producto</button>
+    </header>
+
+    <div class="content">
+      <!-- Filtros -->
+      <div class="search-filters">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="searchInput" placeholder="Buscar por nombre o SKU..." onkeyup="if(event.key==='Enter') loadProducts()">
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="filterCategoria" title="Filtrar por categoría" onchange="loadProducts()">
+              <option value="">Todas las categorías</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="filterMarca" title="Filtrar por marca" onchange="loadProducts()">
+              <option value="">Todas las marcas</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="filterEstado" title="Filtrar por estado" onchange="loadProducts()">
+              <option value="">Todos los estados</option>
+              <option value="activo">Activo</option>
+              <option value="outlet">Outlet</option>
+              <option value="sin_stock">Sin Stock</option>
+              <option value="descatalogado">Descatalogado</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" onclick="loadProducts()"><i class="fas fa-search me-2"></i>Buscar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>Productos</span>
+          <span class="text-muted" id="totalCount">0 productos</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="width:60px">Img</th>
+                <th>SKU</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Marca</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th style="width:120px">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="productsTable">
+              <tr><td colspan="9" class="text-center py-4"><div class="spinner-border"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <nav class="mt-3"><ul class="pagination justify-content-center" id="pagination"></ul></nav>
+    </div>
+  </main>
+
+  <!-- Modal Producto -->
+  <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Nuevo Producto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" title="Cerrar modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="productForm">
+            <input type="hidden" id="productId">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label" for="pSku">SKU *</label>
+                <input type="text" class="form-control" id="pSku" required title="Código SKU del producto">
+              </div>
+              <div class="col-md-8">
+                <label class="form-label" for="pNombre">Nombre *</label>
+                <input type="text" class="form-control" id="pNombre" required title="Nombre del producto">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pCategoria">Categoría</label>
+                <select class="form-select" id="pCategoria" title="Seleccionar categoría"></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="pMarca">Marca</label>
+                <select class="form-select" id="pMarca" title="Seleccionar marca"></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="pPrecio">Precio Base €</label>
+                <input type="number" step="0.01" class="form-control" id="pPrecio" title="Precio base en Euros">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="pStock">Stock</label>
+                <input type="number" class="form-control" id="pStock" title="Cantidad en stock">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="pEstado">Estado</label>
+                <select class="form-select" id="pEstado" title="Estado de disponibilidad">
+                  <option value="activo">Activo</option>
+                  <option value="outlet">Outlet</option>
+                  <option value="proximamente">Próximamente</option>
+                  <option value="sin_stock">Sin Stock</option>
+                  <option value="descatalogado">Descatalogado</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="pDescCorta">Descripción Corta</label>
+                <textarea class="form-control" id="pDescCorta" rows="2" title="Resumen del producto"></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label">URL Imagen Principal</label>
+                <input type="text" class="form-control" id="pImagen" placeholder="https://...">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-accent" onclick="saveProduct()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+    let currentPage = 1;
+    let productModal;
+
+    async function checkAuth() {
+      const r = await fetch(`${API}/auth/session`, { credentials: 'include' });
+      const d = await r.json();
+      if (!d.authenticated || (d.user.rol !== 'admin' && d.user.rol !== 'super_admin' && d.user.rol !== 'administrador')) {
+        window.location.href = '../login.html?redirect=admin';
+      }
+    }
+
+    async function loadFilters() {
+      // Categorías
+      const catR = await fetch(`${API}/categories`);
+      const catD = await catR.json();
+      if (catD.success) {
+        const catSelect = document.getElementById('filterCategoria');
+        const pCatSelect = document.getElementById('pCategoria');
+        pCatSelect.innerHTML = '<option value="">Sin categoría</option>';
+        catD.categories.forEach(c => {
+          catSelect.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+          pCatSelect.innerHTML += `<option value="${c.id}">${'—'.repeat(c.nivel || 0)} ${c.nombre}</option>`;
+          if (c.children) c.children.forEach(ch => {
+            catSelect.innerHTML += `<option value="${ch.id}">— ${ch.nombre}</option>`;
+            pCatSelect.innerHTML += `<option value="${ch.id}">— ${ch.nombre}</option>`;
+          });
+        });
+      }
+
+      // Marcas
+      const marcaR = await fetch(`${API}/brands`);
+      const marcaD = await marcaR.json();
+      if (marcaD.success) {
+        const marcaSelect = document.getElementById('filterMarca');
+        const pMarcaSelect = document.getElementById('pMarca');
+        pMarcaSelect.innerHTML = '<option value="">Sin marca</option>';
+        marcaD.brands.forEach(m => {
+          marcaSelect.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+          pMarcaSelect.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+        });
+      }
+    }
+
+    async function loadProducts(page = 1) {
+      currentPage = page;
+      const params = new URLSearchParams({
+        page, per_page: 20,
+        search: document.getElementById('searchInput').value,
+        categoria: document.getElementById('filterCategoria').value,
+        marca: document.getElementById('filterMarca').value,
+        estado: document.getElementById('filterEstado').value
+      });
+
+      const r = await fetch(`${API}/admin/products?${params}`, { credentials: 'include' });
+      const d = await r.json();
+
+      const tbody = document.getElementById('productsTable');
+      if (d.success && d.products.length > 0) {
+        tbody.innerHTML = d.products.map(p => `
+          <tr>
+            <td><img src="${p.imagen_principal || 'https://via.placeholder.com/50'}" class="product-img" onerror="this.src='https://via.placeholder.com/50'"></td>
+            <td><code>${p.sku || '-'}</code></td>
+            <td><strong>${p.nombre}</strong></td>
+            <td><small>${p.categoria_nombre || '-'}</small></td>
+            <td><small>${p.marca_nombre || '-'}</small></td>
+            <td><strong>${formatPrice(p.precio_base)}</strong></td>
+            <td>${p.stock_actual || 0}</td>
+            <td><span class="badge badge-${p.estado === 'activo' ? 'activo' : p.estado === 'outlet' ? 'outlet' : 'inactivo'}">${p.estado}</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        `).join('');
+        document.getElementById('totalCount').textContent = `${d.total} productos`;
+        renderPagination(d.total, d.page, d.pages);
+      } else {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">No hay productos</td></tr>';
+        document.getElementById('totalCount').textContent = '0 productos';
+        document.getElementById('pagination').innerHTML = '';
+      }
+    }
+
+    function renderPagination(total, current, pages) {
+      const nav = document.getElementById('pagination');
+      if (pages <= 1) { nav.innerHTML = ''; return; }
+      let html = `<li class="page-item ${current===1?'disabled':''}"><a class="page-link" href="#" onclick="loadProducts(${current-1});return false;">«</a></li>`;
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || (i >= current-2 && i <= current+2)) {
+          html += `<li class="page-item ${i===current?'active':''}"><a class="page-link" href="#" onclick="loadProducts(${i});return false;">${i}</a></li>`;
+        } else if (i === current-3 || i === current+3) {
+          html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+      }
+      html += `<li class="page-item ${current===pages?'disabled':''}"><a class="page-link" href="#" onclick="loadProducts(${current+1});return false;">»</a></li>`;
+      nav.innerHTML = html;
+    }
+
+    function openModal(product = null) {
+      document.getElementById('productForm').reset();
+      document.getElementById('productId').value = '';
+      document.getElementById('modalTitle').textContent = product ? 'Editar Producto' : 'Nuevo Producto';
+      
+      if (product) {
+        document.getElementById('productId').value = product.id;
+        document.getElementById('pSku').value = product.sku || '';
+        document.getElementById('pNombre').value = product.nombre || '';
+        document.getElementById('pCategoria').value = product.categoria_id || '';
+        document.getElementById('pMarca').value = product.marca_id || '';
+        document.getElementById('pPrecio').value = product.precio_base || '';
+        document.getElementById('pStock').value = product.stock_actual || '';
+        document.getElementById('pEstado').value = product.estado || 'activo';
+        document.getElementById('pDescCorta').value = product.descripcion_corta || '';
+        document.getElementById('pImagen').value = product.imagen_principal || '';
+      }
+      
+      productModal.show();
+    }
+
+    async function editProduct(id) {
+      const r = await fetch(`${API}/products/${id}`, { credentials: 'include' });
+      const d = await r.json();
+      if (d.success) openModal(d.product);
+    }
+
+    async function saveProduct() {
+      const id = document.getElementById('productId').value;
+      const data = {
+        sku: document.getElementById('pSku').value,
+        nombre: document.getElementById('pNombre').value,
+        categoria_id: document.getElementById('pCategoria').value || null,
+        marca_id: document.getElementById('pMarca').value || null,
+        precio_base: parseFloat(document.getElementById('pPrecio').value) || 0,
+        stock_actual: parseInt(document.getElementById('pStock').value) || 0,
+        estado: document.getElementById('pEstado').value,
+        descripcion_corta: document.getElementById('pDescCorta').value,
+        imagen_principal: document.getElementById('pImagen').value
+      };
+
+      const url = id ? `${API}/admin/products/${id}` : `${API}/admin/products`;
+      const method = id ? 'PUT' : 'POST';
+
+      const r = await fetch(url, {
+        method, credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const d = await r.json();
+
+      if (d.success) {
+        productModal.hide();
+        loadProducts(currentPage);
+        alert('Producto guardado correctamente');
+      } else {
+        alert('Error: ' + (d.error || 'No se pudo guardar'));
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('¿Eliminar este producto?')) return;
+      const r = await fetch(`${API}/admin/products/${id}`, { method: 'DELETE', credentials: 'include' });
+      const d = await r.json();
+      if (d.success) loadProducts(currentPage);
+      else alert('Error: ' + d.error);
+    }
+
+    function formatPrice(p) { return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(p || 0); }
+
+    async function logout() {
+      await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' });
+      window.location.href = '../login.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      productModal = new bootstrap.Modal(document.getElementById('productModal'));
+      await checkAuth();
+      await loadFilters();
+      await loadProducts();
+    });
+  </script>
+        <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+</html>

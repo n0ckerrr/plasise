@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - PLASISE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-bg: #0a0a0f;
+      --sidebar-hover: #16161d;
+      --accent: #c8a45e;
+      --text-light: #a0a0a0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafafa; min-height: 100vh; }
+    
+    /* Sidebar */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 260px;
+      background: var(--sidebar-bg); color: #fff; z-index: 100;
+      transition: transform 0.3s;
+    }
+    .sidebar-brand {
+      padding: 20px; font-size: 24px; font-family: 'Playfair Display', serif; font-weight: 700;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-brand span { color: var(--accent); }
+    .sidebar-nav { padding: 20px 0; }
+    .nav-section { padding: 10px 20px; font-size: 11px; text-transform: uppercase; color: var(--text-light); letter-spacing: 1px; }
+    .nav-item {
+      display: flex; align-items: center; padding: 12px 20px; color: #fff;
+      text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: var(--accent); }
+    .nav-item.active { background: var(--sidebar-hover); border-left-color: var(--accent); color: var(--accent); }
+    .nav-item i { width: 24px; margin-right: 12px; }
+    
+    /* Main */
+    .main { margin-left: 260px; min-height: 100vh; }
+    
+    /* Top Bar */
+    .topbar {
+      background: #fff; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-size: 20px; font-family: 'Playfair Display', serif; font-weight: 600; }
+    .topbar-user { display: flex; align-items: center; gap: 10px; }
+    .topbar-user img { width: 36px; height: 36px; border-radius: 50%; }
+    
+    /* Content */
+    .content { padding: 30px; }
+    
+    /* Stats Cards */
+    .stat-card {
+      background: #fff; border-radius: 12px; padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: 100%;
+    }
+    .stat-card .icon {
+      width: 50px; height: 50px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 16px;
+    }
+    .stat-card .icon.blue { background: #e3f2fd; color: #1976d2; }
+    .stat-card .icon.green { background: #e8f5e9; color: #388e3c; }
+    .stat-card .icon.orange { background: #fff3e0; color: #f57c00; }
+    .stat-card .icon.red { background: #ffebee; color: #d32f2f; }
+    .stat-card .icon.purple { background: #f3e5f5; color: #7b1fa2; }
+    .stat-card .icon.gold { background: #fff8e1; color: #c8a45e; }
+    .stat-card .value { font-size: 28px; font-family: 'Playfair Display', serif; font-weight: 700; color: #1a1a2e; }
+    .stat-card .label { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+    
+    /* Table Card */
+    .table-card {
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .table-card-header {
+      padding: 20px 24px; border-bottom: 1px solid #eee;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .table-card-header h5 { margin: 0; font-weight: 600; }
+    .table { margin: 0; }
+    .table th { background: #f8f9fa; font-weight: 600; font-size: 12px; text-transform: uppercase; color: #666; border: none; padding: 14px 20px; }
+    .table td { padding: 14px 20px; vertical-align: middle; border-color: #f0f0f0; }
+    
+    /* Badges */
+    .badge-status { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+    .badge-pendiente { background: #fff3e0; color: #f57c00; }
+    .badge-confirmado { background: #e3f2fd; color: #1976d2; }
+    .badge-enviado { background: #e8f5e9; color: #388e3c; }
+    .badge-entregado { background: #e8f5e9; color: #388e3c; }
+    .badge-cancelado { background: #ffebee; color: #d32f2f; }
+    
+    /* Quick Actions */
+    .quick-action {
+      background: #fff; border-radius: 12px; padding: 20px; text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s; cursor: pointer;
+      text-decoration: none; color: inherit; display: block;
+    }
+    .quick-action:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .quick-action i { font-size: 24px; color: var(--accent); margin-bottom: 10px; }
+    .quick-action span { display: block; font-size: 13px; font-weight: 500; }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .main { margin-left: 0; }
+    }
+  </style>
+<script src="../../assets/js/config.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="fas fa-shield-alt"></i>
+      PLASI<span>SE</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="index.html" class="nav-item active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      
+      <div class="nav-section">Catálogo</div>
+      <a href="productos.html" class="nav-item"><i class="fas fa-boxes"></i> Productos</a>
+      <a href="categorias.html" class="nav-item"><i class="fas fa-folder-tree"></i> Categorías</a>
+      <a href="marcas.html" class="nav-item"><i class="fas fa-tags"></i> Marcas</a>
+      
+      <div class="nav-section">Ventas</div>
+      <a href="pedidos.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+      
+      <div class="nav-section">Usuarios</div>
+      <a href="usuarios.html" class="nav-item"><i class="fas fa-users"></i> Usuarios</a>
+      
+      <div class="nav-section">Sistema</div>
+      <a href="eventos.html" class="nav-item"><i class="fas fa-microchip"></i> Eventos Log</a>
+      <a href="notificaciones.html" class="nav-item"><i class="fas fa-bell"></i> Notificaciones</a>
+
+      <a href="../index.html" class="nav-item"><i class="fas fa-external-link-alt"></i> Ver Tienda</a>
+      <a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')" title="Abrir Menú" aria-label="Abrir menú de navegación">
+          <i class="fas fa-bars fa-lg"></i>
+        </button>
+        <h1 class="topbar-title">Dashboard</h1>
+      </div>
+      <div class="topbar-user">
+        <span id="adminName">Admin</span>
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:36px;height:36px">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Stats -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card">
+            <div class="icon blue"><i class="fas fa-boxes"></i></div>
+            <div class="value" id="statProductos">-</div>
+            <div class="label">Productos</div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card">
+            <div class="icon green"><i class="fas fa-users"></i></div>
+            <div class="value" id="statUsuarios">-</div>
+            <div class="label">Usuarios</div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card">
+            <div class="icon gold"><i class="fas fa-shopping-cart"></i></div>
+            <div class="value" id="statPedidosMes">-</div>
+            <div class="label">Pedidos (mes)</div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card">
+            <div class="icon purple"><i class="fas fa-euro-sign"></i></div>
+            <div class="value" id="statVentasMes">-</div>
+            <div class="label">Ventas (mes)</div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card">
+            <div class="icon orange"><i class="fas fa-clock"></i></div>
+            <div class="value" id="statPendientes">-</div>
+            <div class="label">Pendientes</div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+          <div class="stat-card">
+            <div class="icon red"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="value" id="statSinStock">-</div>
+            <div class="label">Sin Stock</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Últimos Pedidos -->
+        <div class="col-lg-8">
+          <div class="table-card">
+            <div class="table-card-header">
+              <h5><i class="fas fa-receipt me-2"></i>Últimos Pedidos</h5>
+              <a href="pedidos.html" class="btn btn-sm btn-outline-primary">Ver todos</a>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Pedido</th>
+                  <th>Cliente</th>
+                  <th>Fecha</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="ultimosPedidos">
+                <tr><td colspan="5" class="text-center py-4"><div class="spinner-border spinner-border-sm"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+          <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
+          <div class="row g-3">
+            <div class="col-6">
+              <a href="productos.html?action=new" class="quick-action">
+                <i class="fas fa-plus-circle"></i>
+                <span>Nuevo Producto</span>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="categorias.html?action=new" class="quick-action">
+                <i class="fas fa-folder-plus"></i>
+                <span>Nueva Categoría</span>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="pedidos.html?estado=pendiente" class="quick-action">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Pedidos Pendientes</span>
+              </a>
+            </div>
+            <div class="col-6">
+              <a href="usuarios.html" class="quick-action">
+                <i class="fas fa-user-plus"></i>
+                <span>Ver Usuarios</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="table-card mt-4">
+            <div class="table-card-header">
+              <h5><i class="fas fa-info-circle me-2"></i>Sistema</h5>
+            </div>
+            <div class="p-3">
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <span class="text-muted">Versión</span>
+                <span class="fw-bold">2.0.0</span>
+              </div>
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <span class="text-muted">Servidor</span>
+                <span class="text-success"><i class="fas fa-circle fa-xs me-1"></i>Online</span>
+              </div>
+              <div class="d-flex justify-content-between py-2">
+                <span class="text-muted">Base de Datos</span>
+                <span class="text-success"><i class="fas fa-circle fa-xs me-1"></i>Conectada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'https://n0cker-plasise.v6hb8q.easypanel.host/api/v1' : (window.location.pathname.startsWith('/plasise') ? window.location.origin + '/plasise/api/v1' : '/api/v1');
+
+    // Check admin auth
+    async function checkAuth() {
+      try {
+        const r = await fetch(`${API}/auth/session`, { credentials: 'include' });
+        const d = await r.json();
+        if (!d.authenticated || (d.user.rol !== 'admin' && d.user.rol !== 'super_admin' && d.user.rol !== 'administrador')) {
+          window.location.href = '../login.html?redirect=admin';
+          return false;
+        }
+        document.getElementById('adminName').textContent = d.user.nombre;
+        return true;
+      } catch(e) {
+        window.location.href = '../login.html?redirect=admin';
+        return false;
+      }
+    }
+
+    // Load dashboard stats
+    async function loadStats() {
+      try {
+        const r = await fetch(`${API}/admin/dashboard/stats`, { credentials: 'include' });
+        const d = await r.json();
+        
+        if (d.success) {
+          document.getElementById('statProductos').textContent = d.stats.productos.toLocaleString();
+          document.getElementById('statUsuarios').textContent = d.stats.usuarios.toLocaleString();
+          document.getElementById('statPedidosMes').textContent = d.stats.pedidos_mes;
+          document.getElementById('statVentasMes').textContent = formatPrice(d.stats.ventas_mes);
+          document.getElementById('statPendientes').textContent = d.stats.pedidos_pendientes;
+          document.getElementById('statSinStock').textContent = d.stats.sin_stock;
+          
+          // Últimos pedidos
+          const tbody = document.getElementById('ultimosPedidos');
+          if (d.ultimos_pedidos && d.ultimos_pedidos.length > 0) {
+            tbody.innerHTML = d.ultimos_pedidos.map(p => `
+              <tr>
+                <td><strong>#${p.numero_pedido || p.id}</strong></td>
+                <td>${p.nombre || 'N/A'}<br><small class="text-muted">${p.email || ''}</small></td>
+                <td>${formatDate(p.fecha)}</td>
+                <td><strong>${formatPrice(p.total)}</strong></td>
+                <td><span class="badge-status badge-${p.estado}">${p.estado}</span></td>
+              </tr>
+            `).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No hay pedidos recientes</td></tr>';
+          }
+        }
+      } catch(e) {
+        console.error('Error loading stats:', e);
+      }
+    }
+
+    function formatPrice(p) {
+      return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(p || 0);
+    }
+
+    function formatDate(d) {
+      if (!d) return '-';
+      return new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' });
+      window.location.href = '../login.html';
+    });
+
+    // Init
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (await checkAuth()) {
+        loadStats();
+      }
+    });
+  </script>
+        <!-- Cookies Banner -->
+    <link rel="stylesheet" href="../../assets/css/cookies.css">
+    <script src="../assets/js/cookies.js"></script>
+</body>
+</html>
