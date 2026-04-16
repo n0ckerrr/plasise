@@ -18,7 +18,11 @@ if [ -f /code/backend/requirements.txt ]; then
     
     # Instalar dependencias si es necesario
     echo "📦 Verificando dependencias..."
-    python3 -m pip install -r /code/backend/requirements.txt 2>&1 | grep -v "Requirement already satisfied" || true
+    python3 -m pip install --no-cache-dir -r /code/backend/requirements.txt 2>&1 | grep -v "Requirement already satisfied" || true
+    
+    # Diagnóstico: Listar paquetes instalados
+    echo "📋 Paquetes instalados:"
+    python3 -m pip list | head -n 20
 else
     echo "⚠️  No se encontró requirements.txt"
 fi
@@ -49,6 +53,8 @@ echo "🎯 Iniciando Flask Application..."
 echo "=========================================="
 echo "📍 Puerto: 5000"
 echo "📍 Host: 0.0.0.0"
+echo "🔍 Verificando procesos en puerto 5000..."
+curl -s http://localhost:5000/health && echo "✅ Servicio ya respondiendo?!" || echo "✓ Puerto 5000 despejado"
 echo "=========================================="
 echo ""
 

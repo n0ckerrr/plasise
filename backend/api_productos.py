@@ -37,8 +37,8 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'aegis_super_secret_key_vps_stable')
 
 # Configuración de seguridad dinámica
-CORS_ORIGINS = os.getenv('CORS_ORIGINS', '*').split(',')
-CORS(app, supports_credentials=True, origins=CORS_ORIGINS)
+CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'https://plasise.es,https://www.plasise.es').split(',')
+CORS(app, supports_credentials=True, origins=CORS_ORIGINS, expose_headers=["Content-Type", "Authorization"])
 
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
@@ -1708,6 +1708,67 @@ def get_my_orders():
         
     except Exception as e:
         return jsonify({'success': False, 'orders': [], 'error': str(e)}), 200
+
+
+@app.route('/api/v1/user/orders/<int:id>/invoice', methods=['GET'])
+def get_order_invoice(id):
+    """Generar factura PDF para un pedido del usuario actual"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'No autenticado'}), 401
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Obtener pedido y verificar propiedad
+        cursor.execute("""
+            SELECT p.*, u.nombre as cliente_nombre, u.email as cliente_email, u.cif, u.empresa
+            FROM pedidos p
+            JOIN usuarios u ON p.usuario_id = u.id
+            WHERE p.id = %s AND p.usuario_id = %s
+        """, (id, session['user_id']))
+        
+        order = cursor.fetchone()
+        if not order:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'Pedido no encontrado o no autorizado'}), 404
+        
+        # Formatear fecha para el PDF
+        if order.get('fecha_pedido'):
+            order['fecha'] = order['fecha_pedido'].strftime('%d/%m/%Y')
+        else:
+            order['fecha'] = datetime.now().strftime('%d/%m/%Y')
+            
+        # Obtener items
+        cursor.execute("""
+            SELECT pd.*, p.nombre
+            FROM pedidos_detalle pd
+            JOIN productos p ON pd.producto_id = p.id
+            WHERE pd.pedido_id = %s
+        """, (id,))
+        
+        items = cursor.fetchall()
+        for item in items:
+            item['precio_unitario'] = float(item.get('precio_unitario', 0))
+            
+        order['items'] = items
+        order['total'] = float(order.get('total', 0))
+        
+        # Generar PDF
+        pdf_content = generate_invoice_pdf(order)
+        
+        cursor.close()
+        conn.close()
+        
+        return Response(
+            pdf_content,
+            mimetype="application/pdf",
+            headers={"Content-disposition": f"attachment; filename=Factura_Plasise_{id}.pdf"}
+        )
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 

@@ -4,15 +4,16 @@
 Establecer un procedimiento estándar y determinista para la generación de documentos legales (facturas) en formato PDF dentro de la plataforma Plasise.
 
 ## Operaciones
-1. **Recolección de Datos:** Extraer datos de la tabla `pedidos` y sus correspondientes `pedido_items`.
-2. **Formateo de Moneda:** Usar `Intl.NumberFormat` (JS) o `locale` (Python) para asegurar que los precios en el PDF sigan el formato `0,00 €`.
-3. **Cálculo de Impuestos:** Calcular el IVA (21% por defecto) de forma desglosada a partir del subtotal.
-4. **Envío de Respuesta:** La API debe servir el archivo como un stream binario con los headers `Content-Type: application/pdf` y `Content-Disposition: attachment`.
+1. **Recolección de Datos:** Extraer datos de la tabla `pedidos` y sus correspondientes `pedidos_detalle` (NUNCA usar `pedido_items` ya que no existe en el esquema).
+2. **Formateo de Moneda:** Usar el formato `0,00 €` y asegurar que los flotantes se redondeen a 2 decimales.
+3. **Cálculo de Impuestos:** Calcular el IVA (21%) dividiendo el total por 1.21 para obtener la base imponible.
+4. **Envío de Respuesta:** Usar `flask.Response` para retornar los bytes del PDF directamente.
 
 ## Restricciones y Casos Borde
-- **Nombres Largos:** Si el nombre de un producto es muy largo, debe truncarse o saltar de línea para no desbordar la tabla.
-- **Letras Especiales:** Asegurar el uso de fuentes que soporten caracteres españoles (ñ, acentos) y el símbolo del Euro (€).
-- **Seguridad:** Solo el usuario dueño del pedido (o un administrador) puede generar el PDF de dicho pedido (validar `session['user_id']`).
+- **Nombres Largos:** Usar `multi_cell` en FPDF para evitar que el texto se corte.
+- **CORS:** No usar `*` en orígenes con `supports_credentials=True`. Especificar dominios reales.
+- **Dependencias:** Si falla el arranque con `ModuleNotFoundError`, verificar que el `Dockerfile` use `python3 -m pip install --no-cache-dir`.
+- **Seguridad:** Validar siempre la propiedad del pedido en la consulta SQL: `WHERE id = %s AND usuario_id = %s`.
 
 ## Salidas Esperadas
 - Archivo PDF profesional, legible y con los datos legales correctos.
