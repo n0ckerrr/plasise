@@ -40,16 +40,15 @@ function showToast(msg, type) {
 
 // Toggle user dropdown menu
 function toggleUserMenu() {
-    var menu = document.querySelector('.user-menu');
-    if (menu) menu.classList.toggle('show');
+    var dropdown = document.getElementById('userDropdown') || document.querySelector('.user-dropdown');
+    if (dropdown) dropdown.classList.toggle('open');
 }
 
 // Close user menu when clicking outside
 document.addEventListener('click', function (e) {
-    var dropdown = document.getElementById('userDropdown');
+    var dropdown = document.getElementById('userDropdown') || document.querySelector('.user-dropdown');
     if (dropdown && !dropdown.contains(e.target)) {
-        var menu = dropdown.querySelector('.user-menu');
-        if (menu) menu.classList.remove('show');
+        dropdown.classList.remove('open');
     }
 });
 
