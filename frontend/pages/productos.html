@@ -781,7 +781,7 @@
                             <strong id="userFullName"></strong>
                             <small id="userEmail"></small>
                         </div>
-                        <a href="admin/productos.html" id="adminLink" style="display: none;"><i
+                        <a href="admin/productos.html" id="adminLink" class="d-none"><i
                                 class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
                         <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
                         <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
@@ -1108,8 +1108,8 @@
           if (adminRoles.includes(data.user.rol)) {
             const adminLink = document.getElementById('adminLink');
             if (adminLink) {
-              adminLink.style.display = 'flex';
               adminLink.classList.remove('d-none');
+              adminLink.classList.add('d-flex');
             }
           }
         } else {
@@ -1205,7 +1205,7 @@
             priceSection = `
               <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
                 <div class="product-price">${formatPrice(p.precio_base)}</div>
-                <button class="btn btn-sm" style="background-color: var(--primary); color: var(--accent); border: 1px solid var(--accent);" onclick="event.stopPropagation(); addToCart(${p.id})">
+                <button class="btn btn-sm btn-product-add" onclick="event.stopPropagation(); addToCart(${p.id})">
                   <i class="fas fa-cart-plus"></i> Añadir
                 </button>
               </div>
@@ -1221,7 +1221,7 @@
           }
 
           col.innerHTML = `
-            <div class="product-card h-100" style="cursor: pointer;" onclick="window.location.href='producto-detalle.html?id=${p.id}'">
+            <div class="product-card h-100" onclick="window.location.href='producto-detalle.html?id=${p.id}'">
               <img src="${p.imagen_principal || 'https://via.placeholder.com/300x200?text=Sin+Imagen'}" 
                    alt="${p.nombre}" loading="lazy"
                    onerror="this.src='https://via.placeholder.com/300x200?text=Sin+Imagen'">

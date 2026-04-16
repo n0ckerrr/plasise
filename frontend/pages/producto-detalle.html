@@ -234,6 +234,8 @@
     }
     .whatsapp-support:hover { background: rgba(37, 211, 102, 0.05); }
 
+    .footer-brand-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; letter-spacing: 2px; }
+
     .product-actions { display: flex; gap: 16px; }
 
     .loading-container { display: flex; flex-direction: column; align-items: center; padding: 100px 0; }
@@ -287,7 +289,7 @@
                             <strong id="userFullName"></strong>
                             <small id="userEmail"></small>
                         </div>
-                        <a href="admin/productos.html" id="adminLink" style="display: none;"><i
+                        <a href="admin/productos.html" id="adminLink" class="d-none"><i
                                 class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
                         <a href="perfil.html"><i class="fas fa-user"></i> Mi Perfil</a>
                         <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
@@ -323,7 +325,7 @@
     </div>
 
     <!-- Related Products -->
-    <div class="related-products" id="relatedProducts" style="display: none;">
+    <div class="related-products d-none" id="relatedProducts">
       <h4><i class="fas fa-th-large me-2"></i>Productos Relacionados</h4>
       <div class="row g-4" id="relatedProductsGrid">
         <!-- Related products will be loaded here -->
@@ -370,8 +372,8 @@
           if (data.user.rol === 'admin' || data.user.rol === 'administrador') {
              const adminLink = document.getElementById('adminLink');
              if (adminLink) {
-                 adminLink.style.display = 'flex';
                  adminLink.classList.remove('d-none');
+                 adminLink.classList.add('d-flex');
              }
           }
 
@@ -556,7 +558,9 @@
               </div>
             `).join('');
 
-            document.getElementById('relatedProducts').style.display = 'block';
+            const relatedContainer = document.getElementById('relatedProducts');
+            relatedContainer.classList.remove('d-none');
+            relatedContainer.classList.add('d-block');
           }
         }
       } catch (error) {
@@ -626,7 +630,7 @@
   <!-- Footer -->
   <footer class="bg-dark text-white py-5 mt-5">
     <div class="container text-center">
-      <p class="mb-3" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; letter-spacing: 2px;">PLASISE</p>
+      <p class="mb-3 footer-brand-title">PLASISE</p>
       <p class="mb-2 text-white-50 small">&copy; 2026 PLASISE. Todos los derechos reservados.</p>
       <div class="legal-links small">
         <a href="legales/aviso-legal.html" class="text-white-50 text-decoration-none mx-2">Aviso Legal</a>

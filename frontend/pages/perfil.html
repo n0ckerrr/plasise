@@ -586,7 +586,7 @@
                             <strong id="userFullName"></strong>
                             <small id="userEmail"></small>
                         </div>
-                        <a href="admin/dashboard.html" id="adminLink" style="display: none;"><i
+                        <a href="admin/dashboard.html" id="adminLink" class="d-none"><i
                                 class="fas fa-tachometer-alt"></i> Dashboard Admin</a>
                         <a href="perfil.html" class="active"><i class="fas fa-user"></i> Mi Perfil</a>
                         <a href="pedidos.html"><i class="fas fa-box"></i> Mis Pedidos</a>
@@ -771,7 +771,10 @@
 
                 if (d.user.rol === 'admin' || d.user.rol === 'administrador') {
                     const adminLink = document.getElementById('adminLink');
-                    if (adminLink) adminLink.style.display = 'flex';
+                    if (adminLink) {
+                        adminLink.classList.remove('d-none');
+                        adminLink.classList.add('d-flex');
+                    }
                 }
 
                 loadCart();
