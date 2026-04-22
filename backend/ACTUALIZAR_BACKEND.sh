@@ -3,7 +3,9 @@ echo "🚀 Actualizando backend de PLASISE..."
 cd /etc/easypanel/projects/n0cker/plasise/code/backend
 cp api_productos.py api_productos.py.backup_$(date +%Y%m%d_%H%M%S)
 cat > api_productos.py << 'PYTHONEND'
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, session, Response
+from invoice_generator import generate_invoice_pdf
+
 from flask_cors import CORS
 import mysql.connector
 import os
@@ -20,17 +22,39 @@ except ImportError:
     HOLDED_ENABLED = False
     print('Holded integration not available')
 
+# Servicio de emails transaccionales
+try:
+    from email_service import (
+        send_welcome_email,
+        send_order_confirmation,
+        send_order_shipped,
+        send_order_delivered
+    )
+    EMAIL_ENABLED = True
+except ImportError:
+    EMAIL_ENABLED = False
+    print('Email service not available')
+
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'aegis_super_secret_key_vps_stable')
 
-CORS(app, supports_credentials=True, origins=['*'])
+# Configuración de seguridad dinámica
+CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'https://plasise.es,https://www.plasise.es').split(',')
+CORS(app, supports_credentials=True, origins=CORS_ORIGINS, expose_headers=["Content-Type", "Authorization"])
 
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
 
 def get_db():
     return mysql.connector.connect(
@@ -66,7 +90,7 @@ init_db()
 # ========================================
 # HEALTH CHECK
 # ========================================
-@app.route('/health', methods=['GET'])
+@app.route('/api/v1/health', methods=['GET'])
 def health_check():
     try:
         conn = get_db()
@@ -101,11 +125,14 @@ def register():
             conn.close()
             return jsonify({'success': False, 'error': 'El email ya esta registrado'}), 400
         
+        if not data.get('acepta_privacidad'):
+            return jsonify({'success': False, 'error': 'Debe aceptar la politica de privacidad'}), 400
+        
         password_hash = generate_password_hash(data['password'])
         
         query = """
-            INSERT INTO usuarios (nombre, apellidos, email, telefono, password_hash, rol, activo, fecha_registro)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO usuarios (nombre, apellidos, email, telefono, password_hash, rol, activo, acepta_privacidad, fecha_aceptacion_privacidad, fecha_registro)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         values = (
             data['nombre'],
@@ -115,6 +142,8 @@ def register():
             password_hash,
             'cliente_retail',
             1,
+            1,
+            datetime.now(),
             datetime.now()
         )
         
@@ -124,6 +153,13 @@ def register():
         
         cursor.close()
         conn.close()
+
+        # Enviar email de bienvenida
+        if EMAIL_ENABLED:
+            send_welcome_email(
+                nombre=data['nombre'],
+                email=data['email']
+            )
         
         return jsonify({'success': True, 'message': 'Usuario registrado exitosamente', 'user_id': user_id}), 201
         
@@ -882,6 +918,352 @@ def delete_address(id):
 
 
 # ========================================
+# ADMIN - GESTIÓN DE MARCAS
+# ========================================
+
+@app.route('/api/v1/admin/brands', methods=['GET'])
+def admin_brands():
+    """Listar todas las marcas para admin (incluye inactivas y conteo de productos)"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT m.*, COUNT(p.id) as productos_count
+            FROM marcas m
+            LEFT JOIN productos p ON p.marca_id = m.id AND p.activo = 1
+            GROUP BY m.id
+            ORDER BY m.nombre
+        """)
+        brands = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'brands': brands})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/brands', methods=['POST'])
+def admin_brands_create():
+    """Crear nueva marca"""
+    try:
+        data = request.get_json()
+        if not data.get('nombre'):
+            return jsonify({'success': False, 'error': 'Nombre es requerido'}), 400
+
+        # Generar slug
+        slug = data['nombre'].lower().strip()
+        slug = slug.replace(' ', '-').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n')
+
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO marcas (nombre, slug, web_oficial, descripcion, activo, fecha_creacion)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+        """, (
+            data['nombre'],
+            slug,
+            data.get('web_oficial', ''),
+            data.get('descripcion', ''),
+            data.get('activo', 1)
+        ))
+        conn.commit()
+        new_id = cursor.lastrowid
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Marca creada', 'id': new_id}), 201
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/brands/<int:id>', methods=['PUT'])
+def admin_brands_update(id):
+    """Actualizar marca"""
+    try:
+        data = request.get_json()
+
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT id FROM marcas WHERE id = %s", (id,))
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'Marca no encontrada'}), 404
+
+        fields = []
+        values = []
+
+        if 'nombre' in data:
+            fields.append("nombre = %s")
+            values.append(data['nombre'])
+            # Actualizar slug también
+            slug = data['nombre'].lower().strip()
+            slug = slug.replace(' ', '-').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n')
+            fields.append("slug = %s")
+            values.append(slug)
+        if 'web_oficial' in data:
+            fields.append("web_oficial = %s")
+            values.append(data['web_oficial'])
+        if 'descripcion' in data:
+            fields.append("descripcion = %s")
+            values.append(data['descripcion'])
+        if 'logo_url' in data:
+            fields.append("logo_url = %s")
+            values.append(data['logo_url'])
+        if 'activo' in data:
+            fields.append("activo = %s")
+            values.append(data['activo'])
+
+        if not fields:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'No hay campos para actualizar'}), 400
+
+        values.append(id)
+        query = f"UPDATE marcas SET {', '.join(fields)} WHERE id = %s"
+        cursor.execute(query, values)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Marca actualizada'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/brands/<int:id>', methods=['DELETE'])
+def admin_brands_delete(id):
+    """Desactivar marca (soft delete)"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE marcas SET activo = 0 WHERE id = %s", (id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Marca eliminada'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ========================================
+# ADMIN - GESTIÓN DE USUARIOS
+# ========================================
+
+@app.route('/api/v1/admin/users', methods=['GET'])
+def admin_users():
+    """Listar usuarios para admin con paginación y filtros"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        search = request.args.get('search', '')
+        rol = request.args.get('rol', '')
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 20))
+        offset = (page - 1) * per_page
+
+        query = """
+            SELECT u.id, u.email, u.nombre, u.apellidos, u.telefono, u.rol, u.activo,
+                   u.fecha_registro, u.ultimo_acceso, u.tipo_usuario,
+                   e.nombre_comercial as empresa
+            FROM usuarios u
+            LEFT JOIN empresas e ON u.empresa_id = e.id
+            WHERE 1=1
+        """
+        params = []
+
+        if search:
+            query += " AND (u.nombre LIKE %s OR u.apellidos LIKE %s OR u.email LIKE %s OR e.nombre_comercial LIKE %s)"
+            s = f"%{search}%"
+            params.extend([s, s, s, s])
+
+        if rol:
+            query += " AND u.rol = %s"
+            params.append(rol)
+
+        # Count
+        count_query = query.replace(
+            "SELECT u.id, u.email, u.nombre, u.apellidos, u.telefono, u.rol, u.activo,\n                   u.fecha_registro, u.ultimo_acceso, u.tipo_usuario,\n                   e.nombre_comercial as empresa",
+            "SELECT COUNT(*) as total"
+        )
+        cursor.execute(count_query, params)
+        total = cursor.fetchone()['total']
+
+        query += " ORDER BY u.fecha_registro DESC LIMIT %s OFFSET %s"
+        params.extend([per_page, offset])
+
+        cursor.execute(query, params)
+        users = cursor.fetchall()
+
+        # Serializar fechas
+        for u in users:
+            if u.get('fecha_registro'):
+                u['fecha_registro'] = u['fecha_registro'].isoformat()
+            if u.get('ultimo_acceso'):
+                u['ultimo_acceso'] = u['ultimo_acceso'].isoformat()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'users': users,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': (total + per_page - 1) // per_page
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/users/<int:id>', methods=['PUT'])
+def admin_users_update(id):
+    """Actualizar usuario"""
+    try:
+        data = request.get_json()
+
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT id FROM usuarios WHERE id = %s", (id,))
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'Usuario no encontrado'}), 404
+
+        fields = []
+        values = []
+
+        if 'nombre' in data:
+            fields.append("nombre = %s")
+            values.append(data['nombre'])
+        if 'apellidos' in data:
+            fields.append("apellidos = %s")
+            values.append(data['apellidos'])
+        if 'telefono' in data:
+            fields.append("telefono = %s")
+            values.append(data['telefono'])
+        if 'rol' in data:
+            fields.append("rol = %s")
+            values.append(data['rol'])
+        if 'activo' in data:
+            fields.append("activo = %s")
+            values.append(data['activo'])
+
+        if not fields:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'No hay campos para actualizar'}), 400
+
+        values.append(id)
+        query = f"UPDATE usuarios SET {', '.join(fields)} WHERE id = %s"
+        cursor.execute(query, values)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Usuario actualizado'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/users/<int:id>', methods=['DELETE'])
+def admin_users_delete(id):
+    """Desactivar usuario (soft delete)"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE usuarios SET activo = 0 WHERE id = %s", (id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Usuario desactivado'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ========================================
+# ADMIN - DASHBOARD
+# ========================================
+@app.route('/api/v1/admin/dashboard/stats', methods=['GET'])
+def admin_dashboard_stats():
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Productos total
+        cursor.execute("SELECT COUNT(*) as total FROM productos")
+        productos = cursor.fetchone()['total']
+        
+        # Productos sin stock
+        cursor.execute("SELECT COUNT(*) as total FROM productos WHERE stock_actual <= 0")
+        sin_stock = cursor.fetchone()['total']
+        
+        # Usuarios total
+        cursor.execute("SELECT COUNT(*) as total FROM usuarios")
+        usuarios = cursor.fetchone()['total']
+        
+        # Pedidos este mes
+        current_month = datetime.now().strftime('%Y-%m')
+        cursor.execute("SELECT COUNT(*) as total, SUM(total) as ventas FROM pedidos WHERE DATE_FORMAT(fecha, '%Y-%m') = %s AND estado != 'cancelado'", (current_month,))
+        mes_stats = cursor.fetchone()
+        pedidos_mes = mes_stats['total']
+        ventas_mes = float(mes_stats['ventas'] or 0)
+        
+        # Pedidos pendientes
+        cursor.execute("SELECT COUNT(*) as total FROM pedidos WHERE estado = 'pendiente'")
+        pedidos_pendientes = cursor.fetchone()['total']
+        
+        # Ultimos 5 pedidos
+        cursor.execute("""
+            SELECT p.id, p.total, p.estado, p.fecha, p.numero_pedido, u.nombre, u.email
+            FROM pedidos p
+            LEFT JOIN usuarios u ON p.usuario_id = u.id
+            ORDER BY p.fecha DESC LIMIT 5
+        """)
+        ultimos_pedidos = cursor.fetchall()
+        
+        for p in ultimos_pedidos:
+            p['total'] = float(p['total'])
+            p['fecha'] = p['fecha'].isoformat()
+            
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'productos': productos,
+                'usuarios': usuarios,
+                'pedidos_mes': pedidos_mes,
+                'ventas_mes': ventas_mes,
+                'pedidos_pendientes': pedidos_pendientes,
+                'sin_stock': sin_stock
+            },
+            'ultimos_pedidos': ultimos_pedidos
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ========================================
 # PEDIDOS DEL USUARIO
 # ========================================
 
@@ -1157,6 +1539,35 @@ def checkout():
         # === FIN INTEGRACIÓN HOLDED ===
         
         conn.commit()
+
+        # Obtener datos del usuario y enviar email de confirmación
+        if EMAIL_ENABLED:
+            try:
+                conn2 = get_db()
+                cur2 = conn2.cursor(dictionary=True)
+                cur2.execute("SELECT nombre, email FROM usuarios WHERE id = %s", (session['user_id'],))
+                usuario_email = cur2.fetchone()
+                cur2.close()
+                conn2.close()
+                if usuario_email:
+                    email_items = [
+                        {'nombre': i.get('nombre', ''), 'cantidad': i.get('cantidad', 1),
+                         'precio': float(i.get('precio_base', 0))}
+                        for i in cart_items
+                    ]
+                    send_order_confirmation(
+                        numero_pedido=numero_pedido,
+                        nombre=usuario_email['nombre'],
+                        email=usuario_email['email'],
+                        items=email_items,
+                        subtotal=subtotal,
+                        iva=impuestos,
+                        total=total,
+                        metodo_pago=metodo_pago
+                    )
+            except Exception as email_err:
+                print(f'[EMAIL] Error en confirmación de pedido: {email_err}')
+
         cursor.close()
         conn.close()
         
@@ -1401,8 +1812,38 @@ def admin_update_order(id):
             query = f"UPDATE pedidos SET {', '.join(updates)} WHERE id = %s"
             cursor.execute(query, values)
             conn.commit()
-        
-        cursor.close()
+
+        # Enviar email según cambio de estado
+        nuevo_estado = data.get('estado', '')
+        if EMAIL_ENABLED and nuevo_estado in ('enviado', 'entregado'):
+            try:
+                cur2 = conn.cursor(dictionary=True)
+                cur2.execute("""
+                    SELECT p.numero_pedido, u.nombre, u.email
+                    FROM pedidos p
+                    JOIN usuarios u ON p.usuario_id = u.id
+                    WHERE p.id = %s
+                """, (id,))
+                pedido_info = cur2.fetchone()
+                cur2.close()
+                if pedido_info:
+                    if nuevo_estado == 'enviado':
+                        send_order_shipped(
+                            numero_pedido=pedido_info['numero_pedido'],
+                            nombre=pedido_info['nombre'],
+                            email=pedido_info['email'],
+                            tracking=data.get('numero_seguimiento', ''),
+                            transportista=data.get('transportista', '')
+                        )
+                    elif nuevo_estado == 'entregado':
+                        send_order_delivered(
+                            numero_pedido=pedido_info['numero_pedido'],
+                            nombre=pedido_info['nombre'],
+                            email=pedido_info['email']
+                        )
+            except Exception as email_err:
+                print(f'[EMAIL] Error en notificación de estado: {email_err}')
+
         cursor.close()
         conn.close()
         
@@ -1574,6 +2015,67 @@ def get_my_orders():
         return jsonify({'success': False, 'orders': [], 'error': str(e)}), 200
 
 
+@app.route('/api/v1/user/orders/<int:id>/invoice', methods=['GET'])
+def get_order_invoice(id):
+    """Generar factura PDF para un pedido del usuario actual"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'No autenticado'}), 401
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Obtener pedido y verificar propiedad
+        cursor.execute("""
+            SELECT p.*, u.nombre as cliente_nombre, u.email as cliente_email, u.cif, u.empresa
+            FROM pedidos p
+            JOIN usuarios u ON p.usuario_id = u.id
+            WHERE p.id = %s AND p.usuario_id = %s
+        """, (id, session['user_id']))
+        
+        order = cursor.fetchone()
+        if not order:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'Pedido no encontrado o no autorizado'}), 404
+        
+        # Formatear fecha para el PDF
+        if order.get('fecha_pedido'):
+            order['fecha'] = order['fecha_pedido'].strftime('%d/%m/%Y')
+        else:
+            order['fecha'] = datetime.now().strftime('%d/%m/%Y')
+            
+        # Obtener items
+        cursor.execute("""
+            SELECT pd.*, p.nombre
+            FROM pedidos_detalle pd
+            JOIN productos p ON pd.producto_id = p.id
+            WHERE pd.pedido_id = %s
+        """, (id,))
+        
+        items = cursor.fetchall()
+        for item in items:
+            item['precio_unitario'] = float(item.get('precio_unitario', 0))
+            
+        order['items'] = items
+        order['total'] = float(order.get('total', 0))
+        
+        # Generar PDF
+        pdf_content = generate_invoice_pdf(order)
+        
+        cursor.close()
+        conn.close()
+        
+        return Response(
+            pdf_content,
+            mimetype="application/pdf",
+            headers={"Content-disposition": f"attachment; filename=Factura_Plasise_{id}.pdf"}
+        )
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 
 # ========================================
 # ENDPOINTS DE NAVEGACIÓN POR CATEGORÍAS
@@ -1634,7 +2136,82 @@ def get_subcategories_by_category_brand(cat_id, brand_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
 PYTHONEND
+
+cat > start_backend.sh << 'BASHEND'
+#!/bin/bash
+
+# ============================================================================
+# PLASISE - Script de Inicio del Backend
+# Se ejecuta automáticamente cuando arranca el contenedor Docker
+# ============================================================================
+
+echo "=========================================="
+echo "🚀 Iniciando Backend PLASISE"
+echo "=========================================="
+
+# Ir al directorio del backend
+cd /code/backend
+
+# Verificar que existe el archivo de requisitos
+if [ -f /code/backend/requirements.txt ]; then
+    echo "✓ Archivo requirements.txt encontrado"
+    
+    # Instalar dependencias si es necesario
+    echo "📦 Verificando dependencias..."
+    
+    # Asegurar que pip y dependencias del sistema están instaladas (si usamos easypanel/base en lugar del Dockerfile)
+    if ! command -v pip3 &> /dev/null && ! python3 -m pip --version &> /dev/null; then
+        echo "🔧 Instalando python3-pip y dependencias de MySQL..."
+        apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip python3-dev default-libmysqlclient-dev pkg-config gcc || true
+    fi
+    
+    python3 -m pip install --break-system-packages --ignore-installed --no-cache-dir -r /code/backend/requirements.txt 2>&1 | grep -v "already satisfied" || \
+    python3 -m pip install --ignore-installed --no-cache-dir -r /code/backend/requirements.txt 2>&1 | grep -v "already satisfied" || true
+    
+    # Diagnóstico: Listar paquetes instalados
+    echo "📋 Paquetes instalados:"
+    python3 -m pip list | head -n 20
+else
+    echo "⚠️  No se encontró requirements.txt"
+fi
+
+# Verificar variables de entorno
+echo ""
+echo "🔧 Verificando configuración..."
+if [ -f .env ]; then
+    echo "✓ Archivo .env encontrado"
+    source .env
+else
+    echo "⚠️  Advertencia: No se encontró archivo .env"
+fi
+
+# Verificar conexión a base de datos
+echo ""
+echo "🗄️  Verificando conexión a base de datos..."
+python3 verify_db.py 2>&1 || echo "⚠️  Advertencia: Error al verificar BD"
+
+# Crear directorio de logs si no existe
+mkdir -p /code/backend/logs
+echo "✓ Directorio de logs creado/verificado"
+
+# Iniciar Flask
+echo ""
+echo "=========================================="
+echo "🎯 Iniciando Flask Application..."
+echo "=========================================="
+echo "📍 Puerto: 5000"
+echo "📍 Host: 0.0.0.0"
+echo "🔍 Verificando procesos en puerto 5000..."
+curl -s http://localhost:5000/health && echo "✅ Servicio ya respondiendo?!" || echo "✓ Puerto 5000 despejado"
+echo "=========================================="
+echo ""
+
+# Ejecutar Flask
+exec python3 /code/backend/api_productos.py
+BASHEND
+
+chmod +x start_backend.sh
+
 echo "✅ Backend actualizado!"
 echo "🔄 Ahora reinicia el contenedor desde EasyPanel"

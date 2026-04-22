@@ -18,7 +18,15 @@ if [ -f /code/backend/requirements.txt ]; then
     
     # Instalar dependencias si es necesario
     echo "📦 Verificando dependencias..."
-    python3 -m pip install --no-cache-dir -r /code/backend/requirements.txt 2>&1 | grep -v "Requirement already satisfied" || true
+    
+    # Asegurar que pip y dependencias del sistema están instaladas (si usamos easypanel/base en lugar del Dockerfile)
+    if ! command -v pip3 &> /dev/null && ! python3 -m pip --version &> /dev/null; then
+        echo "🔧 Instalando python3-pip y dependencias de MySQL..."
+        apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip python3-dev default-libmysqlclient-dev pkg-config gcc || true
+    fi
+    
+    python3 -m pip install --break-system-packages --ignore-installed --no-cache-dir -r /code/backend/requirements.txt 2>&1 | grep -v "already satisfied" || \
+    python3 -m pip install --ignore-installed --no-cache-dir -r /code/backend/requirements.txt 2>&1 | grep -v "already satisfied" || true
     
     # Diagnóstico: Listar paquetes instalados
     echo "📋 Paquetes instalados:"

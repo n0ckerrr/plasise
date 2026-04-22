@@ -913,6 +913,352 @@ def delete_address(id):
 
 
 # ========================================
+# ADMIN - GESTIÓN DE MARCAS
+# ========================================
+
+@app.route('/api/v1/admin/brands', methods=['GET'])
+def admin_brands():
+    """Listar todas las marcas para admin (incluye inactivas y conteo de productos)"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT m.*, COUNT(p.id) as productos_count
+            FROM marcas m
+            LEFT JOIN productos p ON p.marca_id = m.id AND p.activo = 1
+            GROUP BY m.id
+            ORDER BY m.nombre
+        """)
+        brands = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'brands': brands})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/brands', methods=['POST'])
+def admin_brands_create():
+    """Crear nueva marca"""
+    try:
+        data = request.get_json()
+        if not data.get('nombre'):
+            return jsonify({'success': False, 'error': 'Nombre es requerido'}), 400
+
+        # Generar slug
+        slug = data['nombre'].lower().strip()
+        slug = slug.replace(' ', '-').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n')
+
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO marcas (nombre, slug, web_oficial, descripcion, activo, fecha_creacion)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+        """, (
+            data['nombre'],
+            slug,
+            data.get('web_oficial', ''),
+            data.get('descripcion', ''),
+            data.get('activo', 1)
+        ))
+        conn.commit()
+        new_id = cursor.lastrowid
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Marca creada', 'id': new_id}), 201
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/brands/<int:id>', methods=['PUT'])
+def admin_brands_update(id):
+    """Actualizar marca"""
+    try:
+        data = request.get_json()
+
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT id FROM marcas WHERE id = %s", (id,))
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'Marca no encontrada'}), 404
+
+        fields = []
+        values = []
+
+        if 'nombre' in data:
+            fields.append("nombre = %s")
+            values.append(data['nombre'])
+            # Actualizar slug también
+            slug = data['nombre'].lower().strip()
+            slug = slug.replace(' ', '-').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n')
+            fields.append("slug = %s")
+            values.append(slug)
+        if 'web_oficial' in data:
+            fields.append("web_oficial = %s")
+            values.append(data['web_oficial'])
+        if 'descripcion' in data:
+            fields.append("descripcion = %s")
+            values.append(data['descripcion'])
+        if 'logo_url' in data:
+            fields.append("logo_url = %s")
+            values.append(data['logo_url'])
+        if 'activo' in data:
+            fields.append("activo = %s")
+            values.append(data['activo'])
+
+        if not fields:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'No hay campos para actualizar'}), 400
+
+        values.append(id)
+        query = f"UPDATE marcas SET {', '.join(fields)} WHERE id = %s"
+        cursor.execute(query, values)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Marca actualizada'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/brands/<int:id>', methods=['DELETE'])
+def admin_brands_delete(id):
+    """Desactivar marca (soft delete)"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE marcas SET activo = 0 WHERE id = %s", (id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Marca eliminada'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ========================================
+# ADMIN - GESTIÓN DE USUARIOS
+# ========================================
+
+@app.route('/api/v1/admin/users', methods=['GET'])
+def admin_users():
+    """Listar usuarios para admin con paginación y filtros"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        search = request.args.get('search', '')
+        rol = request.args.get('rol', '')
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 20))
+        offset = (page - 1) * per_page
+
+        query = """
+            SELECT u.id, u.email, u.nombre, u.apellidos, u.telefono, u.rol, u.activo,
+                   u.fecha_registro, u.ultimo_acceso, u.tipo_usuario,
+                   e.nombre_comercial as empresa
+            FROM usuarios u
+            LEFT JOIN empresas e ON u.empresa_id = e.id
+            WHERE 1=1
+        """
+        params = []
+
+        if search:
+            query += " AND (u.nombre LIKE %s OR u.apellidos LIKE %s OR u.email LIKE %s OR e.nombre_comercial LIKE %s)"
+            s = f"%{search}%"
+            params.extend([s, s, s, s])
+
+        if rol:
+            query += " AND u.rol = %s"
+            params.append(rol)
+
+        # Count
+        count_query = query.replace(
+            "SELECT u.id, u.email, u.nombre, u.apellidos, u.telefono, u.rol, u.activo,\n                   u.fecha_registro, u.ultimo_acceso, u.tipo_usuario,\n                   e.nombre_comercial as empresa",
+            "SELECT COUNT(*) as total"
+        )
+        cursor.execute(count_query, params)
+        total = cursor.fetchone()['total']
+
+        query += " ORDER BY u.fecha_registro DESC LIMIT %s OFFSET %s"
+        params.extend([per_page, offset])
+
+        cursor.execute(query, params)
+        users = cursor.fetchall()
+
+        # Serializar fechas
+        for u in users:
+            if u.get('fecha_registro'):
+                u['fecha_registro'] = u['fecha_registro'].isoformat()
+            if u.get('ultimo_acceso'):
+                u['ultimo_acceso'] = u['ultimo_acceso'].isoformat()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'users': users,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'pages': (total + per_page - 1) // per_page
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/users/<int:id>', methods=['PUT'])
+def admin_users_update(id):
+    """Actualizar usuario"""
+    try:
+        data = request.get_json()
+
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT id FROM usuarios WHERE id = %s", (id,))
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'Usuario no encontrado'}), 404
+
+        fields = []
+        values = []
+
+        if 'nombre' in data:
+            fields.append("nombre = %s")
+            values.append(data['nombre'])
+        if 'apellidos' in data:
+            fields.append("apellidos = %s")
+            values.append(data['apellidos'])
+        if 'telefono' in data:
+            fields.append("telefono = %s")
+            values.append(data['telefono'])
+        if 'rol' in data:
+            fields.append("rol = %s")
+            values.append(data['rol'])
+        if 'activo' in data:
+            fields.append("activo = %s")
+            values.append(data['activo'])
+
+        if not fields:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'No hay campos para actualizar'}), 400
+
+        values.append(id)
+        query = f"UPDATE usuarios SET {', '.join(fields)} WHERE id = %s"
+        cursor.execute(query, values)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Usuario actualizado'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/v1/admin/users/<int:id>', methods=['DELETE'])
+def admin_users_delete(id):
+    """Desactivar usuario (soft delete)"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE usuarios SET activo = 0 WHERE id = %s", (id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Usuario desactivado'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ========================================
+# ADMIN - DASHBOARD
+# ========================================
+@app.route('/api/v1/admin/dashboard/stats', methods=['GET'])
+def admin_dashboard_stats():
+    try:
+        conn = get_db()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Productos total
+        cursor.execute("SELECT COUNT(*) as total FROM productos")
+        productos = cursor.fetchone()['total']
+        
+        # Productos sin stock
+        cursor.execute("SELECT COUNT(*) as total FROM productos WHERE stock_actual <= 0")
+        sin_stock = cursor.fetchone()['total']
+        
+        # Usuarios total
+        cursor.execute("SELECT COUNT(*) as total FROM usuarios")
+        usuarios = cursor.fetchone()['total']
+        
+        # Pedidos este mes
+        current_month = datetime.now().strftime('%Y-%m')
+        cursor.execute("SELECT COUNT(*) as total, SUM(total) as ventas FROM pedidos WHERE DATE_FORMAT(fecha, '%Y-%m') = %s AND estado != 'cancelado'", (current_month,))
+        mes_stats = cursor.fetchone()
+        pedidos_mes = mes_stats['total']
+        ventas_mes = float(mes_stats['ventas'] or 0)
+        
+        # Pedidos pendientes
+        cursor.execute("SELECT COUNT(*) as total FROM pedidos WHERE estado = 'pendiente'")
+        pedidos_pendientes = cursor.fetchone()['total']
+        
+        # Ultimos 5 pedidos
+        cursor.execute("""
+            SELECT p.id, p.total, p.estado, p.fecha, p.numero_pedido, u.nombre, u.email
+            FROM pedidos p
+            LEFT JOIN usuarios u ON p.usuario_id = u.id
+            ORDER BY p.fecha DESC LIMIT 5
+        """)
+        ultimos_pedidos = cursor.fetchall()
+        
+        for p in ultimos_pedidos:
+            p['total'] = float(p['total'])
+            p['fecha'] = p['fecha'].isoformat()
+            
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'productos': productos,
+                'usuarios': usuarios,
+                'pedidos_mes': pedidos_mes,
+                'ventas_mes': ventas_mes,
+                'pedidos_pendientes': pedidos_pendientes,
+                'sin_stock': sin_stock
+            },
+            'ultimos_pedidos': ultimos_pedidos
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ========================================
 # PEDIDOS DEL USUARIO
 # ========================================
 
@@ -995,52 +1341,6 @@ def get_user_order_detail(id):
         cursor.close()
         conn.close()
         return jsonify({'success': True, 'order': order})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/v1/user/orders/<int:id>/invoice', methods=['GET'])
-def get_order_invoice(id):
-    if not session.get('user_id'):
-        return jsonify({'success': False, 'error': 'No autenticado'}), 401
-    
-    try:
-        conn = get_db()
-        cursor = conn.cursor(dictionary=True)
-        
-        # 1. Obtener pedido (validando propiedad)
-        cursor.execute("""
-            SELECT p.*, u.nombre as cliente_nombre, u.email as cliente_email
-            FROM pedidos p
-            JOIN usuarios u ON p.usuario_id = u.id
-            WHERE p.id = %s AND p.usuario_id = %s
-        """, (id, session['user_id']))
-        order = cursor.fetchone()
-        
-        if not order:
-            return jsonify({'success': False, 'error': 'Pedido no encontrado'}), 404
-            
-        # 2. Obtener items
-        cursor.execute("SELECT * FROM pedido_items WHERE pedido_id = %s", (id,))
-        order['items'] = cursor.fetchall()
-        
-        # 3. Formatear fecha
-        if order.get('fecha'):
-            order['fecha_pedido'] = order['fecha'].strftime("%d/%m/%Y")
-        
-        cursor.close()
-        conn.close()
-        
-        # 4. Generar PDF
-        pdf_bytes = generate_invoice_pdf(order)
-        
-        return Response(
-            pdf_bytes,
-            mimetype='application/pdf',
-            headers={
-                "Content-disposition": f"attachment; filename=Factura_Plasise_{id}.pdf"
-            }
-        )
-        
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
